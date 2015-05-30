@@ -1,0 +1,66 @@
+options {
+    LOOKAHEAD=2;
+}
+ 
+PARSER_BEGIN(DroidParser)
+ 
+public class DroidParser {
+ 
+    public static void main(String[] args) throws ParseException {
+        DroidParser parser = new DroidParser(System.in);
+        System.out.println("Welcome to Droid Interpreter");
+        while (true) {
+            parser.parseCurrentLine();
+        }
+    }
+ 
+}
+ 
+PARSER_END(DroidParser)
+ 
+SKIP:
+{
+    " " | "\r" | "\t"
+}
+ 
+TOKEN:
+{
+    <NUMBER: ( <DIGIT> ) + ( "." ( <DIGIT> )+ )?> | <DIGIT:  [ "0"-"9" ]> | <VARIABLE: [ "A"-"Z" ]>
+    | <BUTTON: "Button"> | <EDITTEXT: "EditText"> | <TEXTVIEW: "TextView"> | <EOL: "\n">
+}
+ 
+void parseCurrentLine():
+{
+    // Add any local variables here...
+}
+{
+    <BUTTON> 
+    { 
+        System.out.println("\nCode:");
+        System.out.println("Button b;"); 
+        System.out.println("b = (Button) findViewById(R.id.button);"); 
+        System.out.println("b.setText(\"\");"); 
+    }
+    |
+    <EDITTEXT> 
+    { 
+        System.out.println("\nCode:");
+        System.out.println("EditText e;"); 
+        System.out.println("e = (EditText) findViewById(R.id.editText);"); 
+        System.out.println("e.setText(\"\");"); 
+
+    } 
+    |
+    <TEXTVIEW> 
+    { 
+        System.out.println("\nCode:");
+        System.out.println("TextView t;"); 
+        System.out.println("t = (TextView) findViewById(R.id.textView);"); 
+        System.out.println("t.setText(\"\");"); 
+    } 
+    |
+    <EOL>
+    |
+    <EOF>   { System.exit(-1); }
+}
+ 
