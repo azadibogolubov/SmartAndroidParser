@@ -13,15 +13,21 @@ public interface DroidParserConstants {
   /** RegularExpression Id. */
   int DIGIT = 5;
   /** RegularExpression Id. */
-  int VARIABLE = 6;
+  int BUTTON = 6;
   /** RegularExpression Id. */
-  int BUTTON = 7;
+  int EDITTEXT = 7;
   /** RegularExpression Id. */
-  int EDITTEXT = 8;
+  int TEXTVIEW = 8;
   /** RegularExpression Id. */
-  int TEXTVIEW = 9;
+  int LISTVIEW = 9;
   /** RegularExpression Id. */
-  int EOL = 10;
+  int RELLAYOUT = 10;
+  /** RegularExpression Id. */
+  int LINLAYOUT = 11;
+  /** RegularExpression Id. */
+  int VARIABLE = 12;
+  /** RegularExpression Id. */
+  int EOL = 13;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -34,10 +40,13 @@ public interface DroidParserConstants {
     "\"\\t\"",
     "<NUMBER>",
     "<DIGIT>",
-    "<VARIABLE>",
     "\"Button\"",
     "\"EditText\"",
     "\"TextView\"",
+    "\"ListView\"",
+    "\"RelativeLayout\"",
+    "\"LinearLayout\"",
+    "<VARIABLE>",
     "\"\\n\"",
   };
 

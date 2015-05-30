@@ -10,34 +10,73 @@ public class DroidParser implements DroidParserConstants {
         }
     }
 
-  static final public void parseCurrentLine() throws ParseException {
+  static final public void parseCurrentLine() throws ParseException {String type;
+    String name;
+    String id;
+    String text;
     if (jj_2_1(2)) {
-      jj_consume_token(BUTTON);
-System.out.println("\u005cnCode:");
-        System.out.println("Button b;");
-        System.out.println("b = (Button) findViewById(R.id.button);");
-        System.out.println("b.setText(\u005c"\u005c");");
-    } else if (jj_2_2(2)) {
-      jj_consume_token(EDITTEXT);
-System.out.println("\u005cnCode:");
-        System.out.println("EditText e;");
-        System.out.println("e = (EditText) findViewById(R.id.editText);");
-        System.out.println("e.setText(\u005c"\u005c");");
-    } else if (jj_2_3(2)) {
-      jj_consume_token(TEXTVIEW);
-System.out.println("\u005cnCode:");
-        System.out.println("TextView t;");
-        System.out.println("t = (TextView) findViewById(R.id.textView);");
-        System.out.println("t.setText(\u005c"\u005c");");
-    } else if (jj_2_4(2)) {
+      type = controlType();
+      name = controlName();
+      id = controlId();
+      text = controlText();
       jj_consume_token(EOL);
-    } else if (jj_2_5(2)) {
+System.out.println("\u005cnCode:");
+        System.out.println(type + " " + name + ";");
+        System.out.println(name + " = (" + type + ") findViewById(R.id." + id + ");");
+        System.out.println(name + ".setText(\u005c"" + text + "\u005c");");
+    } else if (jj_2_2(2)) {
+      jj_consume_token(EOL);
+    } else if (jj_2_3(2)) {
       jj_consume_token(0);
 System.exit(-1);
     } else {
       jj_consume_token(-1);
       throw new ParseException();
     }
+  }
+
+  static final public String controlType() throws ParseException {Token type;
+    if (jj_2_4(2)) {
+      type = jj_consume_token(BUTTON);
+{if ("" != null) return type.toString();}
+    } else if (jj_2_5(2)) {
+      type = jj_consume_token(EDITTEXT);
+{if ("" != null) return type.toString();}
+    } else if (jj_2_6(2)) {
+      type = jj_consume_token(TEXTVIEW);
+{if ("" != null) return type.toString();}
+    } else if (jj_2_7(2)) {
+      type = jj_consume_token(LISTVIEW);
+{if ("" != null) return type.toString();}
+    } else if (jj_2_8(2)) {
+      type = jj_consume_token(RELLAYOUT);
+{if ("" != null) return type.toString();}
+    } else if (jj_2_9(2)) {
+      type = jj_consume_token(LINLAYOUT);
+{if ("" != null) return type.toString();}
+    } else {
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+    throw new Error("Missing return statement in function");
+  }
+
+  static final public String controlName() throws ParseException {Token name;
+    name = jj_consume_token(VARIABLE);
+{if ("" != null) return name.toString();}
+    throw new Error("Missing return statement in function");
+  }
+
+  static final public String controlId() throws ParseException {Token id;
+    id = jj_consume_token(VARIABLE);
+{if ("" != null) return id.toString();}
+    throw new Error("Missing return statement in function");
+  }
+
+  static final public String controlText() throws ParseException {Token text;
+    text = jj_consume_token(VARIABLE);
+{if ("" != null) return text.toString();}
+    throw new Error("Missing return statement in function");
   }
 
   static private boolean jj_2_1(int xla)
@@ -80,33 +119,119 @@ System.exit(-1);
     finally { jj_save(4, xla); }
   }
 
-  static private boolean jj_3_1()
+  static private boolean jj_2_6(int xla)
  {
-    if (jj_scan_token(BUTTON)) return true;
-    return false;
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return !jj_3_6(); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(5, xla); }
   }
 
-  static private boolean jj_3_2()
+  static private boolean jj_2_7(int xla)
+ {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return !jj_3_7(); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(6, xla); }
+  }
+
+  static private boolean jj_2_8(int xla)
+ {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return !jj_3_8(); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(7, xla); }
+  }
+
+  static private boolean jj_2_9(int xla)
+ {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return !jj_3_9(); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(8, xla); }
+  }
+
+  static private boolean jj_3_5()
  {
     if (jj_scan_token(EDITTEXT)) return true;
     return false;
   }
 
-  static private boolean jj_3_3()
+  static private boolean jj_3R_1()
  {
-    if (jj_scan_token(TEXTVIEW)) return true;
-    return false;
-  }
-
-  static private boolean jj_3_5()
- {
-    if (jj_scan_token(0)) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_4()) {
+    jj_scanpos = xsp;
+    if (jj_3_5()) {
+    jj_scanpos = xsp;
+    if (jj_3_6()) {
+    jj_scanpos = xsp;
+    if (jj_3_7()) {
+    jj_scanpos = xsp;
+    if (jj_3_8()) {
+    jj_scanpos = xsp;
+    if (jj_3_9()) return true;
+    }
+    }
+    }
+    }
+    }
     return false;
   }
 
   static private boolean jj_3_4()
  {
+    if (jj_scan_token(BUTTON)) return true;
+    return false;
+  }
+
+  static private boolean jj_3_3()
+ {
+    if (jj_scan_token(0)) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_2()
+ {
+    if (jj_scan_token(VARIABLE)) return true;
+    return false;
+  }
+
+  static private boolean jj_3_2()
+ {
     if (jj_scan_token(EOL)) return true;
+    return false;
+  }
+
+  static private boolean jj_3_9()
+ {
+    if (jj_scan_token(LINLAYOUT)) return true;
+    return false;
+  }
+
+  static private boolean jj_3_8()
+ {
+    if (jj_scan_token(RELLAYOUT)) return true;
+    return false;
+  }
+
+  static private boolean jj_3_1()
+ {
+    if (jj_3R_1()) return true;
+    if (jj_3R_2()) return true;
+    return false;
+  }
+
+  static private boolean jj_3_7()
+ {
+    if (jj_scan_token(LISTVIEW)) return true;
+    return false;
+  }
+
+  static private boolean jj_3_6()
+ {
+    if (jj_scan_token(TEXTVIEW)) return true;
     return false;
   }
 
@@ -130,7 +255,7 @@ System.exit(-1);
    private static void jj_la1_init_0() {
       jj_la1_0 = new int[] {};
    }
-  static final private JJCalls[] jj_2_rtns = new JJCalls[5];
+  static final private JJCalls[] jj_2_rtns = new JJCalls[9];
   static private boolean jj_rescan = false;
   static private int jj_gc = 0;
 
@@ -331,7 +456,7 @@ System.exit(-1);
   /** Generate ParseException. */
   static public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[11];
+    boolean[] la1tokens = new boolean[14];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
@@ -345,7 +470,7 @@ System.exit(-1);
         }
       }
     }
-    for (int i = 0; i < 11; i++) {
+    for (int i = 0; i < 14; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;
@@ -372,7 +497,7 @@ System.exit(-1);
 
   static private void jj_rescan_token() {
     jj_rescan = true;
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 9; i++) {
     try {
       JJCalls p = jj_2_rtns[i];
       do {
@@ -384,6 +509,10 @@ System.exit(-1);
             case 2: jj_3_3(); break;
             case 3: jj_3_4(); break;
             case 4: jj_3_5(); break;
+            case 5: jj_3_6(); break;
+            case 6: jj_3_7(); break;
+            case 7: jj_3_8(); break;
+            case 8: jj_3_9(); break;
           }
         }
         p = p.next;

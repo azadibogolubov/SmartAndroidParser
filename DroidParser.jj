@@ -25,42 +25,66 @@ SKIP:
  
 TOKEN:
 {
-    <NUMBER: ( <DIGIT> ) + ( "." ( <DIGIT> )+ )?> | <DIGIT:  [ "0"-"9" ]> | <VARIABLE: [ "A"-"Z" ]>
-    | <BUTTON: "Button"> | <EDITTEXT: "EditText"> | <TEXTVIEW: "TextView"> | <EOL: "\n">
+    <NUMBER: (<DIGIT>) + ("."(<DIGIT>)+)?> | <DIGIT: ["0"-"9"]> 
+    | <BUTTON: "Button"> | <EDITTEXT: "EditText"> | <TEXTVIEW: "TextView"> 
+    | <LISTVIEW: "ListView"> | <RELLAYOUT: "RelativeLayout"> | <LINLAYOUT: "LinearLayout"> 
+    | <VARIABLE: (["A"-"Z", "a"-"z"])+> | <EOL: "\n">
 }
  
 void parseCurrentLine():
 {
-    // Add any local variables here...
+    String type;
+    String name;
+    String id;
+    String text;
 }
 {
-    <BUTTON> 
+    type=controlType() name=controlName() id=controlId() text=controlText() <EOL>
     { 
         System.out.println("\nCode:");
-        System.out.println("Button b;"); 
-        System.out.println("b = (Button) findViewById(R.id.button);"); 
-        System.out.println("b.setText(\"\");"); 
+        System.out.println(type + " " + name + ";"); 
+        System.out.println(name + " = (" + type + ") findViewById(R.id." + id + ");"); 
+        System.out.println(name + ".setText(\"" + text + "\");"); 
     }
-    |
-    <EDITTEXT> 
-    { 
-        System.out.println("\nCode:");
-        System.out.println("EditText e;"); 
-        System.out.println("e = (EditText) findViewById(R.id.editText);"); 
-        System.out.println("e.setText(\"\");"); 
-
-    } 
-    |
-    <TEXTVIEW> 
-    { 
-        System.out.println("\nCode:");
-        System.out.println("TextView t;"); 
-        System.out.println("t = (TextView) findViewById(R.id.textView);"); 
-        System.out.println("t.setText(\"\");"); 
-    } 
     |
     <EOL>
     |
     <EOF>   { System.exit(-1); }
 }
- 
+
+String controlType():
+{
+    Token type;
+}
+{
+    type = <BUTTON> { return type.toString(); }
+    | type = <EDITTEXT> { return type.toString(); }
+    | type = <TEXTVIEW> { return type.toString(); }
+    | type = <LISTVIEW> { return type.toString(); }
+    | type = <RELLAYOUT> { return type.toString(); }
+    | type = <LINLAYOUT> { return type.toString(); }
+}
+
+String controlName():
+{
+    Token name;
+}
+{
+    name = <VARIABLE> { return name.toString(); }
+}
+
+String controlId():
+{
+    Token id;
+}
+{
+    id = <VARIABLE> { return id.toString(); }
+}
+
+String controlText():
+{
+    Token text;
+}
+{
+    text = <VARIABLE> { return text.toString(); }
+}
