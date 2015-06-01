@@ -25,9 +25,13 @@ public interface DroidParserConstants {
   /** RegularExpression Id. */
   int LINLAYOUT = 11;
   /** RegularExpression Id. */
-  int VARIABLE = 12;
+  int CLICK = 12;
   /** RegularExpression Id. */
-  int EOL = 13;
+  int VAR = 13;
+  /** RegularExpression Id. */
+  int TEXT = 14;
+  /** RegularExpression Id. */
+  int EOL = 15;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -46,7 +50,9 @@ public interface DroidParserConstants {
     "\"ListView\"",
     "\"RelativeLayout\"",
     "\"LinearLayout\"",
-    "<VARIABLE>",
+    "\"Click\"",
+    "<VAR>",
+    "<TEXT>",
     "\"\\n\"",
   };
 

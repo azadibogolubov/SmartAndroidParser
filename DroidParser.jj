@@ -1,5 +1,4 @@
 options {
-    LOOKAHEAD=2;
 }
  
 PARSER_BEGIN(DroidParser)
@@ -25,10 +24,18 @@ SKIP:
  
 TOKEN:
 {
-    <NUMBER: (<DIGIT>) + ("."(<DIGIT>)+)?> | <DIGIT: ["0"-"9"]> 
-    | <BUTTON: "Button"> | <EDITTEXT: "EditText"> | <TEXTVIEW: "TextView"> 
-    | <LISTVIEW: "ListView"> | <RELLAYOUT: "RelativeLayout"> | <LINLAYOUT: "LinearLayout"> 
-    | <VARIABLE: (["A"-"Z", "a"-"z"])+> | <EOL: "\n">
+    <NUMBER: (<DIGIT>)+ ("."(<DIGIT>)+)?> 
+    | <DIGIT: ["0"-"9"]> 
+    | <BUTTON: "Button"> 
+    | <EDITTEXT: "EditText"> 
+    | <TEXTVIEW: "TextView"> 
+    | <LISTVIEW: "ListView"> 
+    | <RELLAYOUT: "RelativeLayout"> 
+    | <LINLAYOUT: "LinearLayout"> 
+    | <CLICK: "Click">
+    | <VAR: (["A"-"Z", "a"-"z"]){1} (["A"-"Z", "a"-"z", "0"-"9"])*> 
+    | <TEXT: (["A"-"Z", "a"-"z", "0"-"9"])+>
+    | <EOL: "\n">
 }
  
 void parseCurrentLine():
@@ -39,14 +46,28 @@ void parseCurrentLine():
     String text;
 }
 {
-    type=controlType() name=controlName() id=controlId() text=controlText() <EOL>
+    type=controlType() name=name() id=id() text=controlText() <EOL>
     { 
-        System.out.println("\nCode:");
         System.out.println(type + " " + name + ";"); 
         System.out.println(name + " = (" + type + ") findViewById(R.id." + id + ");"); 
         System.out.println(name + ".setText(\"" + text + "\");"); 
     }
     |
+    type=layoutType() name=name() id=id() <EOL>
+    {
+        System.out.println(type + " " + name + ";"); 
+        System.out.println(name + " = (" + type + ") findViewById(R.id." + id + ");"); 
+    }
+    |
+    <CLICK> id=id()
+    {
+        System.out.println(id + ".setOnClickListener(new View.OnClickListener() {");
+        System.out.println("@Override");
+        System.out.println("\tpublic void onClick(View v) {");
+        System.out.println("\t\t// Add click logic here...");
+        System.out.println("\t}");
+        System.out.println("});");
+    }
     <EOL>
     |
     <EOF>   { System.exit(-1); }
@@ -61,24 +82,41 @@ String controlType():
     | type = <EDITTEXT> { return type.toString(); }
     | type = <TEXTVIEW> { return type.toString(); }
     | type = <LISTVIEW> { return type.toString(); }
-    | type = <RELLAYOUT> { return type.toString(); }
+}
+
+String layoutType():
+{
+    Token type;
+}
+{
+    type = <RELLAYOUT> { return type.toString(); }
     | type = <LINLAYOUT> { return type.toString(); }
 }
 
-String controlName():
+String name():
 {
     Token name;
 }
 {
-    name = <VARIABLE> { return name.toString(); }
+    name = <TEXT> 
+    { 
+        System.out.println("ERROR: Bad name"); 
+        return ""; 
+    }
+    | name = <VAR> { return name.toString(); }
 }
 
-String controlId():
+String id():
 {
     Token id;
 }
 {
-    id = <VARIABLE> { return id.toString(); }
+    id = <VAR> { return id.toString(); }
+    | id = <TEXT> 
+    { 
+        System.out.println("ERROR: Bad ID"); 
+        return ""; 
+    }
 }
 
 String controlText():
@@ -86,5 +124,5 @@ String controlText():
     Token text;
 }
 {
-    text = <VARIABLE> { return text.toString(); }
+    text = <TEXT> { return text.toString(); }
 }

@@ -1,0 +1,16 @@
+    number ::= (digit)+ (. (digit+)?)
+    digit ::= [0-9] 
+    button ::= "Button"
+    edittext ::= "EditText" 
+    textview ::= TextView 
+    listview ::= "ListView" 
+    rellayout ::= "RelativeLayout"
+    linlayout ::= "LinearLayout" 
+    var ::= (["A"-"Z", "a"-"z"]){1} { ["A"-"Z", "a"-"z", "0"-"9"] } 
+    text ::= (["A"-"Z", "a"-"z", "0"-"9"])+
+    
+    <EOL> ::= "\n"
+    control ::= button | edittext | textview | listview
+    layout ::= rellayout | linlayout
+    expr ::= control controlname controlid controltext <EOL>
+    click ::= "Click" var
