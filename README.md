@@ -4,5 +4,7 @@ UPDATE: 5/29/2015
 CFG in progess.
 
 Sample script entries include:
+
 [Button | TextView | EditText | ListView ] someVarName someId text
+
 [RelativeLayout | LinearLayout ] someVarName someId 
