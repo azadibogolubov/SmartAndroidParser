@@ -5,6 +5,6 @@ CFG in progess.
 
 Sample script entries include:
 
-[Button | TextView | EditText | ListView ] someVarName someId text
+[Button | TextView | EditText | ListView ] someVarName someId "some text"
 
 [RelativeLayout | LinearLayout ] someVarName someId 
