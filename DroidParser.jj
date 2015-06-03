@@ -98,12 +98,12 @@ String name():
     Token name;
 }
 {
-    name = <TEXT> 
+    name = <TEXT> { return name.toString(); }
+    | name = <VAR> 
     { 
         System.out.println("ERROR: Bad name"); 
         return ""; 
     }
-    | name = <VAR> { return name.toString(); }
 }
 
 String id():
@@ -111,8 +111,8 @@ String id():
     Token id;
 }
 {
-    id = <VAR> { return id.toString(); }
-    | id = <TEXT> 
+    id = <TEXT { return id.toString(); }
+    | id = <VAR> 
     { 
         System.out.println("ERROR: Bad ID"); 
         return ""; 
