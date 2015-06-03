@@ -33,8 +33,8 @@ TOKEN:
     | <RELLAYOUT: "RelativeLayout"> 
     | <LINLAYOUT: "LinearLayout"> 
     | <CLICK: "Click">
-    | <VAR: (["A"-"Z", "a"-"z"]){1} (["A"-"Z", "a"-"z", "0"-"9"])*> 
     | <TEXT: (["A"-"Z", "a"-"z", "0"-"9"])+>
+    | <VAR: (["A"-"Z", "a"-"z"]){1} (["A"-"Z", "a"-"z", "0"-"9"])*> 
     | <EOL: "\n">
 }
  
