@@ -26,7 +26,7 @@ public class DroidParser implements DroidParserConstants {
       jj_consume_token(EOL);
 System.out.println(type + " " + name + ";");
         System.out.println(name + " = (" + type + ") findViewById(R.id." + id + ");");
-        System.out.println(name + ".setText(\u005c"" + text + "\u005c");");
+        System.out.println(name + ".setText(" + text + ");");
       break;
       }
     case RELLAYOUT:
@@ -43,6 +43,7 @@ System.out.println(type + " " + name + ";");
       jj_consume_token(CLICK);
       id = id();
 System.out.println(id + ".setOnClickListener(new View.OnClickListener() {");
+        System.out.println("@Override");
         System.out.println("\u005ctpublic void onClick(View v) {");
         System.out.println("\u005ct\u005ct// Add click logic here...");
         System.out.println("\u005ct}");
@@ -114,15 +115,15 @@ System.exit(-1);
 
   static final public String name() throws ParseException {Token name;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+    case VAR:{
+      name = jj_consume_token(VAR);
+{if ("" != null) return name.toString();}
+      break;
+      }
     case TEXT:{
       name = jj_consume_token(TEXT);
 System.out.println("ERROR: Bad name");
         {if ("" != null) return "";}
-      break;
-      }
-    case VAR:{
-      name = jj_consume_token(VAR);
-{if ("" != null) return name.toString();}
       break;
       }
     default:

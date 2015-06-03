@@ -33,7 +33,7 @@ TOKEN:
     | <RELLAYOUT: "RelativeLayout"> 
     | <LINLAYOUT: "LinearLayout"> 
     | <CLICK: "Click">
-    | <TEXT: (["A"-"Z", "a"-"z", "0"-"9"])+>
+    | <TEXT: ("\"")((["A"-"Z", "a"-"z", "0"-"9", " "])+)("\"")>
     | <VAR: (["A"-"Z", "a"-"z"]){1} (["A"-"Z", "a"-"z", "0"-"9"])*> 
     | <EOL: "\n">
 }
@@ -50,7 +50,7 @@ void parseCurrentLine():
     { 
         System.out.println(type + " " + name + ";"); 
         System.out.println(name + " = (" + type + ") findViewById(R.id." + id + ");"); 
-        System.out.println(name + ".setText(\"" + text + "\");"); 
+        System.out.println(name + ".setText(" + text + ");"); 
     }
     |
     type=layoutType() name=name() id=id() <EOL>
@@ -98,8 +98,8 @@ String name():
     Token name;
 }
 {
-    name = <TEXT> { return name.toString(); }
-    | name = <VAR> 
+    name = <VAR> { return name.toString(); }
+    | name = <TEXT> 
     { 
         System.out.println("ERROR: Bad name"); 
         return ""; 
@@ -111,8 +111,8 @@ String id():
     Token id;
 }
 {
-    id = <TEXT { return id.toString(); }
-    | id = <VAR> 
+    id = <VAR> { return id.toString(); }
+    | id = <TEXT> 
     { 
         System.out.println("ERROR: Bad ID"); 
         return ""; 
