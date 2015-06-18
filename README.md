@@ -8,3 +8,5 @@ Sample script entries include:
 [Button | TextView | EditText | ListView ] someVarName someId "some text"
 
 [RelativeLayout | LinearLayout ] someVarName someId 
+
+The idea would be to create a program where you can feed in syntax such as that above, and be able to have it spit out an equivalent Java file that can be used in Eclipse or Android Studio.
