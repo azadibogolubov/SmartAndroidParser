@@ -1,16 +1,47 @@
+    // Numeric data
     number ::= (digit)+ (. (digit+)?)
     digit ::= [0-9] 
+
+    // Controls
     button ::= "Button"
     edittext ::= "EditText" 
     textview ::= TextView 
     listview ::= "ListView" 
+    gridview ::= "GridView"
     rellayout ::= "RelativeLayout"
     linlayout ::= "LinearLayout" 
+
+    // Margins
+    marginleft ::= "ml"
+    marginright ::= "mr"
+    margintop ::= "mt"
+    marginbottom ::= "mb"
+
+    // Padding
+    paddingleft ::= "pl"
+    paddingright ::= "pr"
+    paddingtop ::= "pt"
+    paddingbottom ::= "pb"
+
+    // Layout dimension specifiers
+    layoutwidth ::= "lw"
+    layoutheight ::= "lh"
+    wrapcontent ::= "wc"
+    matchparent ::= "mp"
+
+    // Variable names and text
     var ::= (["A"-"Z", "a"-"z"]){1} { ["A"-"Z", "a"-"z", "0"-"9"] } 
     text ::= (["A"-"Z", "a"-"z", "0"-"9"])+
     
+    // Valid commands
     <EOL> ::= "\n"
-    control ::= button | edittext | textview | listview
+    control ::= button | edittext | textview | listview | gridview
+    controlname ::= var
+    controlid ::= var
+    controltext ::= text
+    margins ::= marginleft | marginright | margintop | marginbottom
+    padding ::= paddingleft | paddingright | paddingtop | paddingbottom
+    layoutdimensions ::= layoutwidth | layoutheight
     layout ::= rellayout | linlayout
-    expr ::= control controlname controlid controltext <EOL>
+    expr ::= (control controlname controlid controltext <EOL>) | (layout (layoutdimensions (wrapcontent | matchparent)){2} <EOL>)
     click ::= "Click" var
