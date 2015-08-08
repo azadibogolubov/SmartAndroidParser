@@ -24,9 +24,16 @@ public class DroidParser implements DroidParserConstants {
       id = id();
       text = controlText();
       jj_consume_token(EOL);
-System.out.println(type + " " + name + ";");
+System.out.println("Java code:");
+        System.out.println(type + " " + name + ";");
         System.out.println(name + " = (" + type + ") findViewById(R.id." + id + ");");
         System.out.println(name + ".setText(" + text + ");");
+        System.out.println();
+        System.out.println("XML code:");
+        System.out.println("<" + type);
+        System.out.println("    android:layout_width=\u005c"wrap_content\u005c"");
+        System.out.println("    android:layout_height=\u005c"wrap_content\u005c"");
+        System.out.println("    android:text=" + text + " />");
       break;
       }
     case RELLAYOUT:

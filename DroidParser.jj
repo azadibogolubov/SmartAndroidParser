@@ -52,10 +52,17 @@ void parseCurrentLine():
 }
 {
     type=controlType() name=name() id=id() text=controlText() <EOL>
-    { 
+    {
+	System.out.println("Java code:"); 
         System.out.println(type + " " + name + ";"); 
         System.out.println(name + " = (" + type + ") findViewById(R.id." + id + ");"); 
-        System.out.println(name + ".setText(" + text + ");"); 
+        System.out.println(name + ".setText(" + text + ");");
+	System.out.println();
+	System.out.println("XML code:");
+	System.out.println("<" + type);
+	System.out.println("    android:layout_width=\"wrap_content\"");
+	System.out.println("    android:layout_height=\"wrap_content\"");
+	System.out.println("    android:text=" + text + " />");
     }
     |
     type=layoutType() name=name() id=id() <EOL>
