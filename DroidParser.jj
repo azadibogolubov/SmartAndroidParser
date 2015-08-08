@@ -24,7 +24,8 @@ SKIP:
  
 TOKEN:
 {
-    <NUMBER: (<DIGIT>)+ ("."(<DIGIT>)+)?> 
+    <HELP: "HELP">
+    | <NUMBER: (<DIGIT>)+ ("."(<DIGIT>)+)?> 
     | <DIGIT: ["0"-"9"]> 
     | <BUTTON: "Button"> 
     | <EDITTEXT: "EditText"> 
@@ -35,6 +36,10 @@ TOKEN:
     | <CLICK: "Click">
     | <TEXT: ("\"")((["A"-"Z", "a"-"z", "0"-"9", " "])+)("\"")>
     | <VAR: (["A"-"Z", "a"-"z"]){1} (["A"-"Z", "a"-"z", "0"-"9"])*> 
+    | <MARGIN_LEFT: "ml">
+    | <MARGIN_RIGHT: "mr">
+    | <MARGIN_TOP: "mt">
+    | <MARGIN_BOTTOM: "mb">
     | <EOL: "\n">
 }
  
@@ -67,6 +72,21 @@ void parseCurrentLine():
         System.out.println("\t\t// Add click logic here...");
         System.out.println("\t}");
         System.out.println("});");
+    }
+    |
+    <HELP> <EOL>
+    {
+        System.out.println("Valid types include:");
+        System.out.println("[CONTROLTYPE]");
+        System.out.println("Button, EditText, TextView, ListView");
+        System.out.println("[LAYOUTTYPE]");
+        System.out.println("LinearLayout, RelativeLayout");
+        System.out.println("Valid names follow the following regex convention:");
+        System.out.println("[\"A\"-\"Z\", \"a\"-\"z\"]){1} ([\"A\"-\"Z\", \"a\"-\"z\", \"0\"-\"9\"]");
+        System.out.println("Valid commands include:");
+        System.out.println("[CONTROLTYPE] name id \"text\"");
+        System.out.println("[LAYOUTTYPE] name id");
+        System.out.println("CLICK id");
     }
     <EOL>
     |

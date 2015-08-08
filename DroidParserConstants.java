@@ -9,29 +9,39 @@ public interface DroidParserConstants {
   /** End of File. */
   int EOF = 0;
   /** RegularExpression Id. */
-  int NUMBER = 4;
+  int HELP = 4;
   /** RegularExpression Id. */
-  int DIGIT = 5;
+  int NUMBER = 5;
   /** RegularExpression Id. */
-  int BUTTON = 6;
+  int DIGIT = 6;
   /** RegularExpression Id. */
-  int EDITTEXT = 7;
+  int BUTTON = 7;
   /** RegularExpression Id. */
-  int TEXTVIEW = 8;
+  int EDITTEXT = 8;
   /** RegularExpression Id. */
-  int LISTVIEW = 9;
+  int TEXTVIEW = 9;
   /** RegularExpression Id. */
-  int RELLAYOUT = 10;
+  int LISTVIEW = 10;
   /** RegularExpression Id. */
-  int LINLAYOUT = 11;
+  int RELLAYOUT = 11;
   /** RegularExpression Id. */
-  int CLICK = 12;
+  int LINLAYOUT = 12;
   /** RegularExpression Id. */
-  int TEXT = 13;
+  int CLICK = 13;
   /** RegularExpression Id. */
-  int VAR = 14;
+  int TEXT = 14;
   /** RegularExpression Id. */
-  int EOL = 15;
+  int VAR = 15;
+  /** RegularExpression Id. */
+  int MARGIN_LEFT = 16;
+  /** RegularExpression Id. */
+  int MARGIN_RIGHT = 17;
+  /** RegularExpression Id. */
+  int MARGIN_TOP = 18;
+  /** RegularExpression Id. */
+  int MARGIN_BOTTOM = 19;
+  /** RegularExpression Id. */
+  int EOL = 20;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -42,6 +52,7 @@ public interface DroidParserConstants {
     "\" \"",
     "\"\\r\"",
     "\"\\t\"",
+    "\"HELP\"",
     "<NUMBER>",
     "<DIGIT>",
     "\"Button\"",
@@ -53,6 +64,10 @@ public interface DroidParserConstants {
     "\"Click\"",
     "<TEXT>",
     "<VAR>",
+    "\"ml\"",
+    "\"mr\"",
+    "\"mt\"",
+    "\"mb\"",
     "\"\\n\"",
   };
 

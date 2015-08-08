@@ -48,6 +48,22 @@ System.out.println(id + ".setOnClickListener(new View.OnClickListener() {");
         System.out.println("\u005ct\u005ct// Add click logic here...");
         System.out.println("\u005ct}");
         System.out.println("});");
+      break;
+      }
+    case HELP:{
+      jj_consume_token(HELP);
+      jj_consume_token(EOL);
+System.out.println("Valid types include:");
+        System.out.println("[CONTROLTYPE]");
+        System.out.println("Button, EditText, TextView, ListView");
+        System.out.println("[LAYOUTTYPE]");
+        System.out.println("LinearLayout, RelativeLayout");
+        System.out.println("Valid names follow the following regex convention:");
+        System.out.println("[\u005c"A\u005c"-\u005c"Z\u005c", \u005c"a\u005c"-\u005c"z\u005c"]){1} ([\u005c"A\u005c"-\u005c"Z\u005c", \u005c"a\u005c"-\u005c"z\u005c", \u005c"0\u005c"-\u005c"9\u005c"]");
+        System.out.println("Valid commands include:");
+        System.out.println("[CONTROLTYPE] name id \u005c"text\u005c"");
+        System.out.println("[LAYOUTTYPE] name id");
+        System.out.println("CLICK id");
       jj_consume_token(EOL);
       break;
       }
@@ -177,7 +193,7 @@ System.out.println("ERROR: Bad ID");
       jj_la1_init_0();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x1fc1,0x3c0,0xc00,0x6000,0x6000,};
+      jj_la1_0 = new int[] {0x3f91,0x780,0x1800,0xc000,0xc000,};
    }
 
   /** Constructor with InputStream. */
@@ -315,7 +331,7 @@ System.out.println("ERROR: Bad ID");
   /** Generate ParseException. */
   static public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[16];
+    boolean[] la1tokens = new boolean[21];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
@@ -329,7 +345,7 @@ System.out.println("ERROR: Bad ID");
         }
       }
     }
-    for (int i = 0; i < 16; i++) {
+    for (int i = 0; i < 21; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;
