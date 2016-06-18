@@ -8,8 +8,9 @@ public class DroidParser {
     public static void main(String[] args) throws ParseException {
         DroidParser parser = new DroidParser(System.in);
         System.out.println("Welcome to Droid Interpreter");
+        System.out.println("Type HELP for instructions");
         while (true) {
-            parser.parseCurrentLine();
+            parser.parseNextLine();
         }
     }
  
@@ -31,6 +32,7 @@ TOKEN:
     | <EDITTEXT: "EditText"> 
     | <TEXTVIEW: "TextView"> 
     | <LISTVIEW: "ListView"> 
+    | <RECYCLERVIEW: "RecyclerView">
     | <RELLAYOUT: "RelativeLayout"> 
     | <LINLAYOUT: "LinearLayout"> 
     | <CLICK: "Click">
@@ -43,7 +45,7 @@ TOKEN:
     | <EOL: "\n">
 }
  
-void parseCurrentLine():
+void parseNextLine():
 {
     String type;
     String name;
@@ -85,7 +87,7 @@ void parseCurrentLine():
     {
         System.out.println("Valid types include:");
         System.out.println("[CONTROLTYPE]");
-        System.out.println("Button, EditText, TextView, ListView");
+        System.out.println("Button, EditText, TextView, ListView, RecyclerView");
         System.out.println("[LAYOUTTYPE]");
         System.out.println("LinearLayout, RelativeLayout");
         System.out.println("Valid names follow the following regex convention:");
@@ -109,6 +111,7 @@ String controlType():
     | type = <EDITTEXT> { return type.toString(); }
     | type = <TEXTVIEW> { return type.toString(); }
     | type = <LISTVIEW> { return type.toString(); }
+    | type = <RECYCLERVIEW> { return type.toString(); }
 }
 
 String layoutType():
