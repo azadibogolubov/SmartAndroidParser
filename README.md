@@ -21,6 +21,7 @@ LinearLayout rootLayout rootLayout
 
 This will ideally generate the following XML:
 
+```xml
 <LinearLayout
 	android:layout_width="wrap_content"
 	android:layout_height="wrap_content"
@@ -56,5 +57,6 @@ This will ideally generate the following XML:
 			android:text="Cancel" />
 	</RelativeLayout>
 <LinearLayout>	
+```
 
 The idea would be to create a program where you can feed in syntax such as that above, and be able to have it spit out an equivalent Java file that can be used in Eclipse or Android Studio.
