@@ -2,18 +2,30 @@ options {
 }
  
 PARSER_BEGIN(DroidParser)
- 
+import java.io.*;
+import java.util.*;
+
 public class DroidParser {
- 
+    static java.util.Stack<String> unclosedTags;
+
     public static void main(String[] args) throws ParseException {
-        DroidParser parser = new DroidParser(System.in);
-        System.out.println("Welcome to Droid Interpreter");
-        System.out.println("Type HELP for instructions");
-        while (true) {
-            parser.parseNextLine();
+        unclosedTags = new Stack<String>();
+        if (args.length == 0) {
+            System.out.println("Please provide file name in arguments list...");
         }
+        else if (args.length == 1) {
+            try {
+                DroidParser parser = new DroidParser(new FileInputStream(args[0]));
+                while (true) {
+                    parser.parseNextLine();
+                }
+            }
+            catch (FileNotFoundException e) {
+                System.out.println("DroidParser: The file was not able to be processed...");
+                return;
+            }
+        }   
     }
- 
 }
  
 PARSER_END(DroidParser)
@@ -38,10 +50,10 @@ TOKEN:
     | <CLICK: "Click">
     | <TEXT: ("\"")((["A"-"Z", "a"-"z", "0"-"9", " "])+)("\"")>
     | <VAR: (["A"-"Z", "a"-"z"]){1} (["A"-"Z", "a"-"z", "0"-"9"])*> 
-    | <MARGIN_LEFT: "ml">
-    | <MARGIN_RIGHT: "mr">
-    | <MARGIN_TOP: "mt">
-    | <MARGIN_BOTTOM: "mb">
+    // | <MARGIN_LEFT: "ml">
+    // | <MARGIN_RIGHT: "mr">
+    // | <MARGIN_TOP: "mt">
+    // | <MARGIN_BOTTOM: "mb">
     | <EOL: "\n">
 }
  
@@ -55,25 +67,32 @@ void parseNextLine():
 {
     type=controlType() name=name() id=id() text=controlText() <EOL>
     {
-	System.out.println("Java code:"); 
-        System.out.println(type + " " + name + ";"); 
-        System.out.println(name + " = (" + type + ") findViewById(R.id." + id + ");"); 
-        System.out.println(name + ".setText(" + text + ");");
-	System.out.println();
-	System.out.println("XML code:");
+	// System.out.println("Java code:"); 
+ //        System.out.println(type + " " + name + ";"); 
+ //        System.out.println(name + " = (" + type + ") findViewById(R.id." + id + ");"); 
+ //        System.out.println(name + ".setText(" + text + ");");
+	// System.out.println();
+	// System.out.println("XML code:");
 	System.out.println("<" + type);
-	System.out.println("    android:layout_width=\"wrap_content\"");
-	System.out.println("    android:layout_height=\"wrap_content\"");
-	System.out.println("    android:text=" + text + " />");
+	System.out.println("\tandroid:layout_width=\"wrap_content\"");
+	System.out.println("\tandroid:layout_height=\"wrap_content\"");
+	System.out.println("\tandroid:text=" + text + " />");
     }
     |
     type=layoutType() name=name() id=id() <EOL>
     {
-        System.out.println(type + " " + name + ";"); 
-        System.out.println(name + " = (" + type + ") findViewById(R.id." + id + ");"); 
+        // System.out.println(type + " " + name + ";");  
+        // System.out.println(name + " = (" + type + ") findViewById(R.id." + id + ");"); 
+        System.out.println("<" + type);
+        System.out.println("\tandroid:id=\"@+id/" + id + "\"");
+        System.out.println("\tandroid:layout_width=\"wrap_content\"");
+        System.out.println("\tandroid:layout_height=\"wrap_content\" >");
+        unclosedTags.push(type);
+        System.out.println("Tags: " + unclosedTags);
+        System.out.println("</" + type + ">");
     }
     |
-    <CLICK> id=id()
+    <CLICK> id=id() <EOL>
     {
         System.out.println(id + ".setOnClickListener(new View.OnClickListener() {");
         System.out.println("@Override");

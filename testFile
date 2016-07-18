@@ -1,0 +1,3 @@
+LinearLayout someName someId
+RelativeLayout someName someId
+Button someName someId "someText"
