@@ -6,22 +6,26 @@ import java.io.*;
 import java.util.*;
 
 public class DroidParser {
+    static int numTabs;
     static Stack<String> unclosedTags;
     static File file;
     static FileWriter fw;
     static BufferedWriter bw;
+    static ArrayList<String> indents;
 
     public static void main(String[] args) throws ParseException {
         try {
+            numTabs = 0;
             unclosedTags = new Stack<String>();
-            file = new File("output.xml");
+            file = new File(args[1]);
             fw = new FileWriter(file.getAbsoluteFile());
             bw = new BufferedWriter(fw);
+            indents = new ArrayList<String>();
 
             if (args.length == 0) {
                 System.out.println("Please provide file name in arguments list...");
             }
-            else if (args.length == 1) {
+            else {
                 try {
                     DroidParser parser = new DroidParser(new FileInputStream(args[0]));
                     while (true) {
@@ -79,10 +83,6 @@ TOKEN:
     | <CLICK: "Click">
     | <TEXT: ("\"")((["A"-"Z", "a"-"z", "0"-"9", " "])+)("\"")>
     | <VAR: (["A"-"Z", "a"-"z"]){1} (["A"-"Z", "a"-"z", "0"-"9"])*> 
-    // | <MARGIN_LEFT: "ml">
-    // | <MARGIN_RIGHT: "mr">
-    // | <MARGIN_TOP: "mt">
-    // | <MARGIN_BOTTOM: "mb">
     | <EOL: "\n">
 }
  
@@ -96,30 +96,22 @@ void parseNextLine():
 {
     type=controlType() name=name() id=id() text=controlText() <EOL>
     {
-	// System.out.println("Java code:"); 
- //        System.out.println(type + " " + name + ";"); 
- //        System.out.println(name + " = (" + type + ") findViewById(R.id." + id + ");"); 
- //        System.out.println(name + ".setText(" + text + ");");
-	// System.out.println();
-	// System.out.println("XML code:");
     	writeln("<" + type);
         writeln("\tandroid:layout_width=\"wrap_content\"");
         writeln("\tandroid:layout_height=\"wrap_content\"");
     	writeln("\tandroid:text=" + text + " />");
-        close();
+        numTabs = 0;
     }
     |
     type=layoutType() name=name() id=id() <EOL>
     {
-        // System.out.println(type + " " + name + ";");  
-        // System.out.println(name + " = (" + type + ") findViewById(R.id." + id + ");"); 
         writeln("<" + type);
         writeln("\tandroid:id=\"@+id/" + id + "\"");
         writeln("\tandroid:layout_width=\"wrap_content\"");
         writeln("\tandroid:layout_height=\"wrap_content\" >");
         unclosedTags.push(type);
-        //System.out.println("Tags: " + unclosedTags);
         writeln("</" + type + ">");
+        numTabs = 0;
     }
     |
     <CLICK> id=id() <EOL>
@@ -130,6 +122,7 @@ void parseNextLine():
         writeln("\t\t// Add click logic here...");
         writeln("\t}");
         writeln("});");
+        numTabs = 0;
     }
     |
     <HELP> <EOL>
@@ -148,7 +141,10 @@ void parseNextLine():
     }
     <EOL>
     |
-    <EOF>   { System.exit(-1); }
+    <EOF>   { 
+        close(); 
+        System.exit(0); 
+    }
 }
 
 String controlType():
@@ -168,8 +164,19 @@ String layoutType():
     Token type;
 }
 {
-    type = <RELLAYOUT> { return type.toString(); }
-    | type = <LINLAYOUT> { return type.toString(); }
+    type = <RELLAYOUT> { 
+        String input = type.toString();
+        if (input.contains("\t")) {
+            indents = ((ArrayList<String>) Arrays.asList(input.split("\t")));
+        }
+        if (indents.size() > 0) {
+            numTabs = indents.size() - 1;
+        }
+        return type.toString(); 
+    }
+    | type = <LINLAYOUT> { 
+        return type.toString(); 
+    }
 }
 
 String name():
