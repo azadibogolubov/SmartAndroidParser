@@ -1,2 +1,5 @@
-./javacc
+javacc/*
 .idea
+*.class
+*.java
+
