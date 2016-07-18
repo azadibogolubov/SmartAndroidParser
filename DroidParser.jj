@@ -6,25 +6,54 @@ import java.io.*;
 import java.util.*;
 
 public class DroidParser {
-    static java.util.Stack<String> unclosedTags;
+    static Stack<String> unclosedTags;
+    static File file;
+    static FileWriter fw;
+    static BufferedWriter bw;
 
     public static void main(String[] args) throws ParseException {
-        unclosedTags = new Stack<String>();
-        if (args.length == 0) {
-            System.out.println("Please provide file name in arguments list...");
-        }
-        else if (args.length == 1) {
-            try {
-                DroidParser parser = new DroidParser(new FileInputStream(args[0]));
-                while (true) {
-                    parser.parseNextLine();
+        try {
+            unclosedTags = new Stack<String>();
+            file = new File("output.xml");
+            fw = new FileWriter(file.getAbsoluteFile());
+            bw = new BufferedWriter(fw);
+
+            if (args.length == 0) {
+                System.out.println("Please provide file name in arguments list...");
+            }
+            else if (args.length == 1) {
+                try {
+                    DroidParser parser = new DroidParser(new FileInputStream(args[0]));
+                    while (true) {
+                        parser.parseNextLine();
+                    }
                 }
-            }
-            catch (FileNotFoundException e) {
-                System.out.println("DroidParser: The file was not able to be processed...");
-                return;
-            }
-        }   
+                catch (FileNotFoundException e) {
+                    System.out.println("DroidParser: The file was not able to be processed...");
+                    return;
+                }
+            }   
+        }
+        catch (IOException e) {
+            System.out.println("IOException: BufferedWriter error...");
+        }
+    }
+
+    public static void writeln(String input) {
+        try {
+            bw.write(input);
+            bw.newLine();
+        }
+        catch (IOException e) {}
+    }
+
+    public static void close() {
+        try {
+            bw.close();
+        }
+        catch (IOException e) {
+            System.out.println("Could not close writer...");
+        }
     }
 }
  
@@ -73,33 +102,34 @@ void parseNextLine():
  //        System.out.println(name + ".setText(" + text + ");");
 	// System.out.println();
 	// System.out.println("XML code:");
-	System.out.println("<" + type);
-	System.out.println("\tandroid:layout_width=\"wrap_content\"");
-	System.out.println("\tandroid:layout_height=\"wrap_content\"");
-	System.out.println("\tandroid:text=" + text + " />");
+    	writeln("<" + type);
+        writeln("\tandroid:layout_width=\"wrap_content\"");
+        writeln("\tandroid:layout_height=\"wrap_content\"");
+    	writeln("\tandroid:text=" + text + " />");
+        close();
     }
     |
     type=layoutType() name=name() id=id() <EOL>
     {
         // System.out.println(type + " " + name + ";");  
         // System.out.println(name + " = (" + type + ") findViewById(R.id." + id + ");"); 
-        System.out.println("<" + type);
-        System.out.println("\tandroid:id=\"@+id/" + id + "\"");
-        System.out.println("\tandroid:layout_width=\"wrap_content\"");
-        System.out.println("\tandroid:layout_height=\"wrap_content\" >");
+        writeln("<" + type);
+        writeln("\tandroid:id=\"@+id/" + id + "\"");
+        writeln("\tandroid:layout_width=\"wrap_content\"");
+        writeln("\tandroid:layout_height=\"wrap_content\" >");
         unclosedTags.push(type);
-        System.out.println("Tags: " + unclosedTags);
-        System.out.println("</" + type + ">");
+        //System.out.println("Tags: " + unclosedTags);
+        writeln("</" + type + ">");
     }
     |
     <CLICK> id=id() <EOL>
     {
-        System.out.println(id + ".setOnClickListener(new View.OnClickListener() {");
-        System.out.println("@Override");
-        System.out.println("\tpublic void onClick(View v) {");
-        System.out.println("\t\t// Add click logic here...");
-        System.out.println("\t}");
-        System.out.println("});");
+        writeln(id + ".setOnClickListener(new View.OnClickListener() {");
+        writeln("@Override");
+        writeln("\tpublic void onClick(View v) {");
+        writeln("\t\t// Add click logic here...");
+        writeln("\t}");
+        writeln("});");
     }
     |
     <HELP> <EOL>

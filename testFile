@@ -1,3 +1,4 @@
 LinearLayout someName someId
 RelativeLayout someName someId
+TextView someTv someTv "text"
 Button someName someId "someText"
