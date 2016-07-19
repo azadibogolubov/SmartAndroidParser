@@ -9,12 +9,12 @@ Sample script entries include:
 
 A valid script might look like the following:
 ```
-LinearLayout 
-	Button 
-	Textview 
- 	RelativeLayout 
-		Button 
-		Button 
+LinearLayout someId
+	Button someId "some text"
+	Textview someId "some text"
+ 	RelativeLayout someId
+		Button someId "some text"
+		Button someId "some text"
 ```
 
 This will ideally generate the following XML:
@@ -27,11 +27,13 @@ This will ideally generate the following XML:
 
 	<Button
 		android:layout_width="wrap_content"
-		android:layout_height="wrap_content" />
+		android:layout_height="wrap_content" 
+		android:text="some text" />
 
 	<TextView
 		android:layout_width="wrap_content"
-		android:layout_height="wrap_content" />
+		android:layout_height="wrap_content" 
+		android:text="some text" />
 
 	<RelativeLayout
 		android:layout_width="wrap_content"
@@ -40,11 +42,13 @@ This will ideally generate the following XML:
 
 		<Button
 			android:layout_width="wrap_content"
-			android:layout_height="wrap_content" />
+			android:layout_height="wrap_content"
+			android:text="some text" />
 
 		<Button
 			android:layout_width="wrap_content"
-			android:layout_height="wrap_content" />
+			android:layout_height="wrap_content"
+			android:text="some text" />
 	</RelativeLayout>
 <LinearLayout>	
 ```
