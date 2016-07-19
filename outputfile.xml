@@ -1,18 +1,14 @@
 <LinearLayout
 	android:id="@+id/someId"
 	android:layout_width="wrap_content"
-	android:layout_height="wrap_content" >
+	android:layout_height="wrap_content">
 </LinearLayout>
 <RelativeLayout
 	android:id="@+id/someId"
 	android:layout_width="wrap_content"
-	android:layout_height="wrap_content" >
+	android:layout_height="wrap_content">
 </RelativeLayout>
-<TextView
-	android:layout_width="wrap_content"
-	android:layout_height="wrap_content"
-	android:text="text" />
 <Button
 	android:layout_width="wrap_content"
 	android:layout_height="wrap_content"
-	android:text="someText" />
+	android:text="some text" />

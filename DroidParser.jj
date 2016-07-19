@@ -13,6 +13,17 @@ public class DroidParser {
     static BufferedWriter bw;
     static ArrayList<String> indents;
 
+    static String badId = "ERROR: Bad ID";
+    static String badName = "ERROR: Bad Name";
+    static String needFileName = "Please provide file name in arguments list...";
+    static String couldNotProcessFile = "DroidParser: The file was not able to be processed...";
+    static String bwError = "IOException: BufferedWriter error...";
+    static String closeWriterError = "Could not close writer...";
+    static String layout_width = "android:layout_width=";
+    static String layout_height = "android:layout_height=";
+    static String wrap_content = "\"wrap_content\"";
+    static String match_parent = "\"match_parent\"";
+
     public static void main(String[] args) throws ParseException {
         try {
             numTabs = 0;
@@ -23,7 +34,7 @@ public class DroidParser {
             indents = new ArrayList<String>();
 
             if (args.length == 0) {
-                System.out.println("Please provide file name in arguments list...");
+                System.out.println(needFileName);
             }
             else {
                 try {
@@ -33,17 +44,17 @@ public class DroidParser {
                     }
                 }
                 catch (FileNotFoundException e) {
-                    System.out.println("DroidParser: The file was not able to be processed...");
+                    System.out.println();
                     return;
                 }
             }   
         }
         catch (IOException e) {
-            System.out.println("IOException: BufferedWriter error...");
+            System.out.println(bwError);
         }
     }
 
-    public static void writeln(String input) {
+    private static void writeln(String input) {
         try {
             bw.write(input);
             bw.newLine();
@@ -51,12 +62,23 @@ public class DroidParser {
         catch (IOException e) {}
     }
 
-    public static void close() {
+    private static void close() {
         try {
             bw.close();
         }
         catch (IOException e) {
-            System.out.println("Could not close writer...");
+            System.out.println(closeWriterError);
+        }
+    }
+
+    private static void processIndents(Token type) {
+        String input = type.toString();
+        if (input.contains("\t")) {
+            indents = ((ArrayList<String>) Arrays.asList(input.split("\t")));
+            if (indents.size() > 0) {
+                numTabs = indents.size() - 1;
+                unclosedTags.push(input);
+            }
         }
     }
 }
@@ -97,8 +119,8 @@ void parseNextLine():
     type=controlType() name=name() id=id() text=controlText() <EOL>
     {
     	writeln("<" + type);
-        writeln("\tandroid:layout_width=\"wrap_content\"");
-        writeln("\tandroid:layout_height=\"wrap_content\"");
+        writeln("\t" + layout_width + wrap_content);
+        writeln("\t" + layout_height + wrap_content);
     	writeln("\tandroid:text=" + text + " />");
         numTabs = 0;
     }
@@ -107,8 +129,8 @@ void parseNextLine():
     {
         writeln("<" + type);
         writeln("\tandroid:id=\"@+id/" + id + "\"");
-        writeln("\tandroid:layout_width=\"wrap_content\"");
-        writeln("\tandroid:layout_height=\"wrap_content\" >");
+        writeln("\t" + layout_width + wrap_content);
+        writeln("\t" + layout_height + wrap_content + ">");
         unclosedTags.push(type);
         writeln("</" + type + ">");
         numTabs = 0;
@@ -124,22 +146,6 @@ void parseNextLine():
         writeln("});");
         numTabs = 0;
     }
-    |
-    <HELP> <EOL>
-    {
-        System.out.println("Valid types include:");
-        System.out.println("[CONTROLTYPE]");
-        System.out.println("Button, EditText, TextView, ListView, RecyclerView");
-        System.out.println("[LAYOUTTYPE]");
-        System.out.println("LinearLayout, RelativeLayout");
-        System.out.println("Valid names follow the following regex convention:");
-        System.out.println("[\"A\"-\"Z\", \"a\"-\"z\"]){1} ([\"A\"-\"Z\", \"a\"-\"z\", \"0\"-\"9\"]");
-        System.out.println("Valid commands include:");
-        System.out.println("[CONTROLTYPE] name id \"text\"");
-        System.out.println("[LAYOUTTYPE] name id");
-        System.out.println("CLICK id");
-    }
-    <EOL>
     |
     <EOF>   { 
         close(); 
@@ -165,16 +171,11 @@ String layoutType():
 }
 {
     type = <RELLAYOUT> { 
-        String input = type.toString();
-        if (input.contains("\t")) {
-            indents = ((ArrayList<String>) Arrays.asList(input.split("\t")));
-        }
-        if (indents.size() > 0) {
-            numTabs = indents.size() - 1;
-        }
+        processIndents(type);
         return type.toString(); 
     }
-    | type = <LINLAYOUT> { 
+    | type = <LINLAYOUT> {
+        processIndents(type); 
         return type.toString(); 
     }
 }
@@ -187,8 +188,8 @@ String name():
     name = <VAR> { return name.toString(); }
     | name = <TEXT> 
     { 
-        System.out.println("ERROR: Bad name"); 
-        return ""; 
+        System.out.println(badName); 
+        return badName; 
     }
 }
 
@@ -200,8 +201,8 @@ String id():
     id = <VAR> { return id.toString(); }
     | id = <TEXT> 
     { 
-        System.out.println("ERROR: Bad ID"); 
-        return ""; 
+        System.out.println(badId); 
+        return badId; 
     }
 }
 
