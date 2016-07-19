@@ -26,26 +26,31 @@ This will ideally generate the following XML:
 	android:id="@+id/rootLayout">
 
 	<Button
+		android:id="@+id/someId"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content" 
 		android:text="some text" />
 
 	<TextView
+		android:id="@+id/someId"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content" 
 		android:text="some text" />
 
 	<RelativeLayout
+		android:id="@+id/someId"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:id="@+id/relativeLayout" >
 
 		<Button
+			android:id="@+id/someId"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:text="some text" />
 
 		<Button
+			android:id="@+id/someId"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:text="some text" />
