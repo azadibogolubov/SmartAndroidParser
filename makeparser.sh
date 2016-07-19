@@ -2,4 +2,4 @@
 
 ./javacc/bin/javacc DroidParser.jj
 javac DroidParser.java
-java DroidParser testFile
+java DroidParser testFile outputfile.xml
