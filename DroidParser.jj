@@ -54,6 +54,13 @@ public class DroidParser {
         }
     }
 
+    private static void write(String input) {
+        try {
+            bw.write(input);
+        }
+        catch (IOException e) {}
+    }
+
     private static void writeln(String input) {
         try {
             bw.write(input);
@@ -105,6 +112,7 @@ TOKEN:
     | <CLICK: "Click">
     | <TEXT: ("\"")((["A"-"Z", "a"-"z", "0"-"9", " "])+)("\"")>
     | <VAR: (["A"-"Z", "a"-"z"]){1} (["A"-"Z", "a"-"z", "0"-"9"])*> 
+    | <CLOSETAG: "/">
     | <EOL: "\n">
 }
  
@@ -127,12 +135,12 @@ void parseNextLine():
     |
     type=layoutType() name=name() id=id() <EOL>
     {
+        write("    ");
         writeln("<" + type);
         writeln("\tandroid:id=\"@+id/" + id + "\"");
         writeln("\t" + layout_width + wrap_content);
         writeln("\t" + layout_height + wrap_content + ">");
         unclosedTags.push(type);
-        writeln("</" + type + ">");
         numTabs = 0;
     }
     |
@@ -147,7 +155,13 @@ void parseNextLine():
         numTabs = 0;
     }
     |
-    <EOF>   { 
+    <CLOSETAG> <EOL>
+    {
+        writeln("</" + unclosedTags.pop() + ">");
+    }
+    |
+    <EOF>   
+    { 
         close(); 
         System.exit(0); 
     }
