@@ -1,5 +1,6 @@
 LinearLayout someName someId
 /
 RelativeLayout someName someId
-	Button someBtn someId "some text"
+'
+Button someBtn someId "some text"
 /

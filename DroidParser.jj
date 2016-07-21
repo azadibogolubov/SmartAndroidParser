@@ -69,23 +69,24 @@ public class DroidParser {
         catch (IOException e) {}
     }
 
+    private static void writeTabbedLine(String input) {
+        try {
+            for (int i = 0; i < numTabs; i++) {
+                write("" + "\t");
+            }
+            bw.write("" + "\t");
+            bw.write(input);
+            bw.newLine();
+        }
+        catch (IOException e) {}
+    }
+
     private static void close() {
         try {
             bw.close();
         }
         catch (IOException e) {
             System.out.println(closeWriterError);
-        }
-    }
-
-    private static void processIndents(Token type) {
-        String input = type.toString();
-        if (input.contains("\t")) {
-            indents = ((ArrayList<String>) Arrays.asList(input.split("\t")));
-            if (indents.size() > 0) {
-                numTabs = indents.size() - 1;
-                unclosedTags.push(input);
-            }
         }
     }
 }
@@ -113,6 +114,7 @@ TOKEN:
     | <TEXT: ("\"")((["A"-"Z", "a"-"z", "0"-"9", " "])+)("\"")>
     | <VAR: (["A"-"Z", "a"-"z"]){1} (["A"-"Z", "a"-"z", "0"-"9"])*> 
     | <CLOSETAG: "/">
+    | <INDENT: "\'">
     | <EOL: "\n">
 }
  
@@ -126,22 +128,27 @@ void parseNextLine():
 {
     type=controlType() name=name() id=id() text=controlText() <EOL>
     {
+        for (int i = 0; i < numTabs; i++) {
+            write("" + "\t");
+        }
     	writeln("<" + type);
-        writeln("\t" + layout_width + wrap_content);
-        writeln("\t" + layout_height + wrap_content);
-    	writeln("\tandroid:text=" + text + " />");
-        numTabs = 0;
+        writeTabbedLine(layout_width + wrap_content);
+        writeTabbedLine(layout_height + wrap_content);
+    	writeTabbedLine("android:text=" + text + " />");
+        writeln("");
     }
     |
     type=layoutType() name=name() id=id() <EOL>
     {
-        write("    ");
+        for (int i = 0; i < numTabs; i++) {
+            write("" + "\t");
+        }
         writeln("<" + type);
-        writeln("\tandroid:id=\"@+id/" + id + "\"");
-        writeln("\t" + layout_width + wrap_content);
-        writeln("\t" + layout_height + wrap_content + ">");
+        writeTabbedLine("android:id=\"@+id/" + id + "\"");
+        writeTabbedLine(layout_width + wrap_content);
+        writeTabbedLine(layout_height + wrap_content + ">");
+        writeln("");
         unclosedTags.push(type);
-        numTabs = 0;
     }
     |
     <CLICK> id=id() <EOL>
@@ -152,12 +159,17 @@ void parseNextLine():
         writeln("\t\t// Add click logic here...");
         writeln("\t}");
         writeln("});");
-        numTabs = 0;
+    }
+    |
+    <INDENT> <EOL>
+    {
+        numTabs += 1;
     }
     |
     <CLOSETAG> <EOL>
     {
         writeln("</" + unclosedTags.pop() + ">");
+        writeln("");
     }
     |
     <EOF>   
@@ -172,11 +184,21 @@ String controlType():
     Token type;
 }
 {
-    type = <BUTTON> { return type.toString(); }
-    | type = <EDITTEXT> { return type.toString(); }
-    | type = <TEXTVIEW> { return type.toString(); }
-    | type = <LISTVIEW> { return type.toString(); }
-    | type = <RECYCLERVIEW> { return type.toString(); }
+    type = <BUTTON> { 
+        return type.toString(); 
+    }
+    | type = <EDITTEXT> { 
+        return type.toString(); 
+    }
+    | type = <TEXTVIEW> { 
+        return type.toString();
+    }
+    | type = <LISTVIEW> { 
+        return type.toString(); 
+    }
+    | type = <RECYCLERVIEW> { 
+        return type.toString(); 
+    }
 }
 
 String layoutType():
@@ -185,11 +207,9 @@ String layoutType():
 }
 {
     type = <RELLAYOUT> { 
-        processIndents(type);
         return type.toString(); 
     }
     | type = <LINLAYOUT> {
-        processIndents(type); 
         return type.toString(); 
     }
 }
