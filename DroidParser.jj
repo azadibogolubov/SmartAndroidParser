@@ -115,6 +115,7 @@ TOKEN:
     | <VAR: (["A"-"Z", "a"-"z"]){1} (["A"-"Z", "a"-"z", "0"-"9"])*> 
     | <CLOSETAG: "/">
     | <INDENT: "\'">
+    | <INDENTANDCLOSE: "~">
     | <EOL: "\n">
 }
  
@@ -126,15 +127,102 @@ void parseNextLine():
     String text;
 }
 {
+    <INDENT> type=controlType() name=name() id=id() text=controlText() <EOL>
+    {
+        numTabs += 1;
+        for (int i = 0; i < numTabs; i++) {
+            write("" + "\t");
+        }
+        writeln("<" + type);
+        writeTabbedLine(layout_width + wrap_content);
+        writeTabbedLine(layout_height + wrap_content);
+        writeTabbedLine("android:text=" + text + " />");
+        writeln("");
+    }
+    |
+    <INDENT> type=layoutType() name=name() id=id() <EOL>
+    {
+        numTabs += 1;
+        for (int i = 0; i < numTabs; i++) {
+            write("" + "\t");
+        }
+        writeln("<" + type);
+        writeTabbedLine("android:id=\"@+id/" + id + "\"");
+        writeTabbedLine(layout_width + wrap_content);
+        writeTabbedLine(layout_height + wrap_content + ">");
+        writeln("");
+        unclosedTags.push(type);
+    }
+    |
+    <INDENTANDCLOSE> type=controlType() name=name() id=id() text=controlText() <EOL>
+    {
+        numTabs += 1;
+        for (int i = 0; i < numTabs; i++) {
+            write("" + "\t");
+        }
+        writeln("<" + type);
+        writeTabbedLine(layout_width + wrap_content);
+        writeTabbedLine(layout_height + wrap_content);
+        writeTabbedLine("android:text=" + text + " />");
+        writeln("");
+        writeln("</" + unclosedTags.pop() + ">");
+        writeln("");
+    }
+    |
+    <INDENTANDCLOSE> type=layoutType() name=name() id=id() <EOL>
+    {
+        numTabs += 1;
+        for (int i = 0; i < numTabs; i++) {
+            write("" + "\t");
+        }
+        writeln("<" + type);
+        writeTabbedLine("android:id=\"@+id/" + id + "\"");
+        writeTabbedLine(layout_width + wrap_content);
+        writeTabbedLine(layout_height + wrap_content + ">");
+        writeln("");
+        unclosedTags.push(type);
+        writeln("</" + unclosedTags.pop() + ">");
+        writeln("");
+    }
+    |
+    <CLOSETAG> type=controlType() name=name() id=id() text=controlText() <EOL>
+    {
+        for (int i = 0; i < numTabs; i++) {
+            write("" + "\t");
+        }
+        writeln("<" + type);
+        writeTabbedLine(layout_width + wrap_content);
+        writeTabbedLine(layout_height + wrap_content);
+        writeTabbedLine("android:text=" + text + " />");
+        writeln("");
+        writeln("</" + unclosedTags.pop() + ">");
+        writeln("");
+    }
+    |
+    <CLOSETAG> type=layoutType() name=name() id=id() <EOL>
+    {
+        for (int i = 0; i < numTabs; i++) {
+            write("" + "\t");
+        }
+        writeln("<" + type);
+        writeTabbedLine("android:id=\"@+id/" + id + "\"");
+        writeTabbedLine(layout_width + wrap_content);
+        writeTabbedLine(layout_height + wrap_content + ">");
+        writeln("");
+        unclosedTags.push(type);
+        writeln("</" + unclosedTags.pop() + ">");
+        writeln("");
+    }
+    |
     type=controlType() name=name() id=id() text=controlText() <EOL>
     {
         for (int i = 0; i < numTabs; i++) {
             write("" + "\t");
         }
-    	writeln("<" + type);
+        writeln("<" + type);
         writeTabbedLine(layout_width + wrap_content);
         writeTabbedLine(layout_height + wrap_content);
-    	writeTabbedLine("android:text=" + text + " />");
+        writeTabbedLine("android:text=" + text + " />");
         writeln("");
     }
     |
@@ -159,17 +247,6 @@ void parseNextLine():
         writeln("\t\t// Add click logic here...");
         writeln("\t}");
         writeln("});");
-    }
-    |
-    <INDENT> <EOL>
-    {
-        numTabs += 1;
-    }
-    |
-    <CLOSETAG> <EOL>
-    {
-        writeln("</" + unclosedTags.pop() + ">");
-        writeln("");
     }
     |
     <EOF>   
