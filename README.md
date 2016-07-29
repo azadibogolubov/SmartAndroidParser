@@ -3,18 +3,18 @@ This is a transpiler which will generate Android XML using a DSL to simplify the
 
 Sample script entries include:
 
-[Button | TextView | EditText | ListView ] someVarName someId "some text"
+[Button | TextView | EditText | ListView ] 
 
-[RelativeLayout | LinearLayout ] someVarName someId 
+[RelativeLayout | LinearLayout ] 
 
 A valid script might look like the following:
 ```
-LinearLayout rootLayout rootLayout
-	Button someBtn btn1 "I'm a button"
-	Textview tv tv1 "I'm a textview"
- 	RelativeLayout nestedLayout relativeLayout
-		Button okBtn btn2 "OK"
-		Button cancelBtn btn3 "Cancel"
+LinearLayout 
+	Button 
+	Textview 
+ 	RelativeLayout 
+		Button 
+		Button 
 ```
 
 This will ideally generate the following XML:
@@ -27,15 +27,11 @@ This will ideally generate the following XML:
 
 	<Button
 		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:id="@+id/btn1" 
-		android:text="I'm a button" />
+		android:layout_height="wrap_content" />
 
 	<TextView
 		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:id="@+id/btn2"
-		android:text="I'm a textview" />
+		android:layout_height="wrap_content" />
 
 	<RelativeLayout
 		android:layout_width="wrap_content"
@@ -44,15 +40,11 @@ This will ideally generate the following XML:
 
 		<Button
 			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:id="@+id/btn2"
-			android:text="OK" />
+			android:layout_height="wrap_content" />
 
 		<Button
 			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:id="@+id/btn3"
-			android:text="Cancel" />
+			android:layout_height="wrap_content" />
 	</RelativeLayout>
 <LinearLayout>	
 ```

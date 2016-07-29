@@ -5,23 +5,11 @@
     // Controls
     button ::= "Button"
     edittext ::= "EditText" 
-    textview ::= TextView 
+    textview ::= "TextView "
     listview ::= "ListView" 
-    gridview ::= "GridView"
     rellayout ::= "RelativeLayout"
     linlayout ::= "LinearLayout" 
-
-    // Margins
-    marginleft ::= "ml"
-    marginright ::= "mr"
-    margintop ::= "mt"
-    marginbottom ::= "mb"
-
-    // Padding
-    paddingleft ::= "pl"
-    paddingright ::= "pr"
-    paddingtop ::= "pt"
-    paddingbottom ::= "pb"
+    margin ::= "Margin"
 
     // Layout dimension specifiers
     layoutwidth ::= "lw"
@@ -35,13 +23,10 @@
     
     // Valid commands
     <EOL> ::= "\n"
-    control ::= button | edittext | textview | listview | gridview
+    control ::= button | edittext | textview | listview
     controlname ::= var
     controlid ::= var
     controltext ::= text
-    margins ::= marginleft | marginright | margintop | marginbottom
-    padding ::= paddingleft | paddingright | paddingtop | paddingbottom
-    layoutdimensions ::= layoutwidth | layoutheight
-    layout ::= rellayout | linlayout
-    expr ::= (control controlname controlid controltext <EOL>) | (layout (layoutdimensions (wrapcontent | matchparent)){2} <EOL>)
-    click ::= "Click" var
+    layout ::= RelativeLayout | LinearLayout
+    expr ::= (control controlname controlid controltext <EOL>) 
+            | (layout name id [margin [("," digit]{4}]] <EOL>)
