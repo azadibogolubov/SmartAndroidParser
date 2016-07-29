@@ -89,6 +89,23 @@ public class DroidParser {
             System.out.println(closeWriterError);
         }
     }
+
+    private static void writeMargins(String[] margins) {
+        for (int i = 0; i < margins.length; i+=5) { 
+            if (margins[0].equals("Margin")) {
+                writeTabbedLine("android:marginLeft=\"" + margins[1] + "dp\"");
+                writeTabbedLine("android:marginTop=\"" + margins[2] + "dp\""); 
+                writeTabbedLine("android:marginRight=\"" + margins[3] + "dp\"");
+                writeTabbedLine("android:marginBottom=\"" + margins[4] + "dp\" />");
+            }
+        }
+    }
+
+    private static void writeIdWidthAndHeight(String id) {
+        writeTabbedLine("android:id=\"@+id/" + id + "\"");
+        writeTabbedLine(layout_width + wrap_content);
+        writeTabbedLine(layout_height + wrap_content + ">");
+    }
 }
  
 PARSER_END(DroidParser)
@@ -137,8 +154,7 @@ void parseNextLine():
             write("" + "\t");
         }
         writeln("<" + type);
-        writeTabbedLine(layout_width + wrap_content);
-        writeTabbedLine(layout_height + wrap_content);
+        writeIdWidthAndHeight(id);
         writeTabbedLine("android:text=" + text + " />");
         writeln("");
     }
@@ -150,20 +166,8 @@ void parseNextLine():
             write("" + "\t");
         }
         writeln("<" + type);
-        writeTabbedLine("android:id=\"@+id/" + id + "\"");
-        writeTabbedLine(layout_width + wrap_content);
-        writeTabbedLine(layout_height + wrap_content + ">");
-        writeln("");
-        String[] paramsArray = params.split(",");
-        String resolvedParam = "";
-        for (int i = 0; i < paramsArray.length; i+=5) { 
-            if (paramsArray[0].equals("Margin")) {
-                writeTabbedLine("android:marginLeft=\"" + paramsArray[1] + "dp\"");
-                writeTabbedLine("android:marginTop=\"" + paramsArray[2] + "dp\""); 
-                writeTabbedLine("android:marginRight=\"" + paramsArray[3] + "dp\"");
-                writeTabbedLine("android:marginBottom=\"" + paramsArray[4] + "dp\" />");
-            }
-        }
+        writeIdWidthAndHeight(id);
+        writeMargins(params.split(","));
         unclosedTags.push(type);
     }
     |
@@ -174,10 +178,7 @@ void parseNextLine():
             write("" + "\t");
         }
         writeln("<" + type);
-        writeTabbedLine("android:id=\"@+id/" + id + "\"");
-        writeTabbedLine(layout_width + wrap_content);
-        writeTabbedLine(layout_height + wrap_content + ">");
-        writeln("");
+        writeIdWidthAndHeight(id);
         unclosedTags.push(type);
     }
     |
@@ -188,9 +189,7 @@ void parseNextLine():
             write("" + "\t");
         }
         writeln("<" + type);
-        writeTabbedLine(layout_width + wrap_content);
-        writeTabbedLine(layout_height + wrap_content);
-        writeTabbedLine("android:text=" + text + " />");
+        writeIdWidthAndHeight(id);
         writeln("");
         writeln("</" + unclosedTags.pop() + ">");
         writeln("");
@@ -203,19 +202,10 @@ void parseNextLine():
             write("" + "\t");
         }
         writeln("<" + type);
-        writeTabbedLine("android:id=\"@+id/" + id + "\"");
-        writeTabbedLine(layout_width + wrap_content);
-        writeTabbedLine(layout_height + wrap_content + ">");
+
         String[] paramsArray = params.split(",");
         String resolvedParam = "";
-        for (int i = 0; i < paramsArray.length; i+=5) { 
-            if (paramsArray[0].equals("Margin")) {
-                writeTabbedLine("android:marginLeft=\"" + paramsArray[1] + "dp\"");
-                writeTabbedLine("android:marginTop=\"" + paramsArray[2] + "dp\""); 
-                writeTabbedLine("android:marginRight=\"" + paramsArray[3] + "dp\"");
-                writeTabbedLine("android:marginBottom=\"" + paramsArray[4] + "dp\" />");
-            }
-        }
+        writeMargins(params.split(","));
         unclosedTags.push(type);
         writeln("</" + unclosedTags.pop() + ">");
         writeln("");
@@ -228,9 +218,7 @@ void parseNextLine():
             write("" + "\t");
         }
         writeln("<" + type);
-        writeTabbedLine("android:id=\"@+id/" + id + "\"");
-        writeTabbedLine(layout_width + wrap_content);
-        writeTabbedLine(layout_height + wrap_content + ">");
+        writeIdWidthAndHeight(id);
         writeln("");
         unclosedTags.push(type);
         writeln("</" + unclosedTags.pop() + ">");
@@ -243,9 +231,7 @@ void parseNextLine():
             write("" + "\t");
         }
         writeln("<" + type);
-        writeTabbedLine(layout_width + wrap_content);
-        writeTabbedLine(layout_height + wrap_content);
-        writeTabbedLine("android:text=" + text + " />");
+        writeIdWidthAndHeight(id);
         writeln("");
         writeln("</" + unclosedTags.pop() + ">");
         writeln("");
@@ -257,9 +243,7 @@ void parseNextLine():
             write("" + "\t");
         }
         writeln("<" + type);
-        writeTabbedLine("android:id=\"@+id/" + id + "\"");
-        writeTabbedLine(layout_width + wrap_content);
-        writeTabbedLine(layout_height + wrap_content + ">");
+        writeIdWidthAndHeight(id);
         writeln("");
         unclosedTags.push(type);
         writeln("</" + unclosedTags.pop() + ">");
@@ -272,8 +256,7 @@ void parseNextLine():
             write("" + "\t");
         }
         writeln("<" + type);
-        writeTabbedLine(layout_width + wrap_content);
-        writeTabbedLine(layout_height + wrap_content);
+        writeIdWidthAndHeight(id);
         writeTabbedLine("android:text=" + text + " />");
         writeln("");
     }
@@ -284,20 +267,8 @@ void parseNextLine():
             write("" + "\t");
         }
         writeln("<" + type);
-        writeTabbedLine("android:id=\"@+id/" + id + "\"");
-        writeTabbedLine(layout_width + wrap_content);
-        writeTabbedLine(layout_height + wrap_content + ">");
-        writeln("");
-        String[] paramsArray = params.split(",");
-        String resolvedParam = "";
-        for (int i = 0; i < paramsArray.length; i+=5) { 
-            if (paramsArray[0].equals("Margin")) {
-                writeTabbedLine("android:marginLeft=\"" + paramsArray[1] + "dp\"");
-                writeTabbedLine("android:marginTop=\"" + paramsArray[2] + "dp\""); 
-                writeTabbedLine("android:marginRight=\"" + paramsArray[3] + "dp\"");
-                writeTabbedLine("android:marginBottom=\"" + paramsArray[4] + "dp\" />");
-            }
-        }
+        writeIdWidthAndHeight(id);
+        writeMargins(params.split(","));
         unclosedTags.push(type);
     }
     |
@@ -307,9 +278,7 @@ void parseNextLine():
             write("" + "\t");
         }
         writeln("<" + type);
-        writeTabbedLine("android:id=\"@+id/" + id + "\"");
-        writeTabbedLine(layout_width + wrap_content);
-        writeTabbedLine(layout_height + wrap_content + ">");
+        writeIdWidthAndHeight(id);
         writeln("");
         unclosedTags.push(type);
     }
