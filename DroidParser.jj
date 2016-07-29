@@ -54,8 +54,27 @@ public class DroidParser {
         }
     }
 
+    private static void write(String input) {
+        try {
+            bw.write(input);
+        }
+        catch (IOException e) {}
+    }
+
     private static void writeln(String input) {
         try {
+            bw.write(input);
+            bw.newLine();
+        }
+        catch (IOException e) {}
+    }
+
+    private static void writeTabbedLine(String input) {
+        try {
+            for (int i = 0; i < numTabs; i++) {
+                write("" + "\t");
+            }
+            bw.write("" + "\t");
             bw.write(input);
             bw.newLine();
         }
@@ -71,15 +90,21 @@ public class DroidParser {
         }
     }
 
-    private static void processIndents(Token type) {
-        String input = type.toString();
-        if (input.contains("\t")) {
-            indents = ((ArrayList<String>) Arrays.asList(input.split("\t")));
-            if (indents.size() > 0) {
-                numTabs = indents.size() - 1;
-                unclosedTags.push(input);
+    private static void writeMargins(String[] margins) {
+        for (int i = 0; i < margins.length; i+=5) { 
+            if (margins[0].equals("Margin")) {
+                writeTabbedLine("android:marginLeft=\"" + margins[1] + "dp\"");
+                writeTabbedLine("android:marginTop=\"" + margins[2] + "dp\""); 
+                writeTabbedLine("android:marginRight=\"" + margins[3] + "dp\"");
+                writeTabbedLine("android:marginBottom=\"" + margins[4] + "dp\" />");
             }
         }
+    }
+
+    private static void writeIdWidthAndHeight(String id) {
+        writeTabbedLine("android:id=\"@+id/" + id + "\"");
+        writeTabbedLine(layout_width + wrap_content);
+        writeTabbedLine(layout_height + wrap_content + ">");
     }
 }
  
@@ -95,6 +120,8 @@ TOKEN:
     <HELP: "HELP">
     | <NUMBER: (<DIGIT>)+ ("."(<DIGIT>)+)?> 
     | <DIGIT: ["0"-"9"]> 
+    | <MARGIN: ("Margin") ((",") <NUMBER>){4}>
+    | <MARGIN1: ("Margin") ((",") <NUMBER>){1}>
     | <BUTTON: "Button"> 
     | <EDITTEXT: "EditText"> 
     | <TEXTVIEW: "TextView"> 
@@ -102,9 +129,12 @@ TOKEN:
     | <RECYCLERVIEW: "RecyclerView">
     | <RELLAYOUT: "RelativeLayout"> 
     | <LINLAYOUT: "LinearLayout"> 
-    | <CLICK: "Click">
+    | <FRMLAYOUT: "FrameLayout">
     | <TEXT: ("\"")((["A"-"Z", "a"-"z", "0"-"9", " "])+)("\"")>
     | <VAR: (["A"-"Z", "a"-"z"]){1} (["A"-"Z", "a"-"z", "0"-"9"])*> 
+    | <CLOSETAG: "/">
+    | <INDENT: "\'">
+    | <INDENTANDCLOSE: "~">
     | <EOL: "\n">
 }
  
@@ -114,40 +144,147 @@ void parseNextLine():
     String name;
     String id;
     String text;
+    String params;
 }
 {
+    <INDENT> type=controlType() name=name() id=id() text=controlText() <EOL>
+    {
+        numTabs += 1;
+        for (int i = 0; i < numTabs; i++) {
+            write("" + "\t");
+        }
+        writeln("<" + type);
+        writeIdWidthAndHeight(id);
+        writeTabbedLine("android:text=" + text + " />");
+        writeln("");
+    }
+    |
+    <INDENT> type=layoutType() name=name() id=id() (params=params())+ <EOL>
+    {
+        numTabs += 1;
+        for (int i = 0; i < numTabs; i++) {
+            write("" + "\t");
+        }
+        writeln("<" + type);
+        writeIdWidthAndHeight(id);
+        writeMargins(params.split(","));
+        unclosedTags.push(type);
+    }
+    |
+    <INDENT> type=layoutType() name=name() id=id() <EOL>
+    {
+        numTabs += 1;
+        for (int i = 0; i < numTabs; i++) {
+            write("" + "\t");
+        }
+        writeln("<" + type);
+        writeIdWidthAndHeight(id);
+        unclosedTags.push(type);
+    }
+    |
+    <INDENTANDCLOSE> type=controlType() name=name() id=id() text=controlText() <EOL>
+    {
+        numTabs += 1;
+        for (int i = 0; i < numTabs; i++) {
+            write("" + "\t");
+        }
+        writeln("<" + type);
+        writeIdWidthAndHeight(id);
+        writeln("");
+        writeln("</" + unclosedTags.pop() + ">");
+        writeln("");
+    }
+    |
+    <INDENTANDCLOSE> type=layoutType() name=name() id=id() (params=params())+ <EOL>
+    {
+        numTabs += 1;
+        for (int i = 0; i < numTabs; i++) {
+            write("" + "\t");
+        }
+        writeln("<" + type);
+
+        String[] paramsArray = params.split(",");
+        String resolvedParam = "";
+        writeMargins(params.split(","));
+        unclosedTags.push(type);
+        writeln("</" + unclosedTags.pop() + ">");
+        writeln("");
+    }
+    |
+    <INDENTANDCLOSE> type=layoutType() name=name() id=id() <EOL>
+    {
+        numTabs += 1;
+        for (int i = 0; i < numTabs; i++) {
+            write("" + "\t");
+        }
+        writeln("<" + type);
+        writeIdWidthAndHeight(id);
+        writeln("");
+        unclosedTags.push(type);
+        writeln("</" + unclosedTags.pop() + ">");
+        writeln("");
+    }
+    |
+    <CLOSETAG> type=controlType() name=name() id=id() text=controlText() <EOL>
+    {
+        for (int i = 0; i < numTabs; i++) {
+            write("" + "\t");
+        }
+        writeln("<" + type);
+        writeIdWidthAndHeight(id);
+        writeln("");
+        writeln("</" + unclosedTags.pop() + ">");
+        writeln("");
+    }
+    |
+    <CLOSETAG> type=layoutType() name=name() id=id() <EOL>
+    {
+        for (int i = 0; i < numTabs; i++) {
+            write("" + "\t");
+        }
+        writeln("<" + type);
+        writeIdWidthAndHeight(id);
+        writeln("");
+        unclosedTags.push(type);
+        writeln("</" + unclosedTags.pop() + ">");
+        writeln("");
+    }
+    |
     type=controlType() name=name() id=id() text=controlText() <EOL>
     {
-    	writeln("<" + type);
-        writeln("\t" + layout_width + wrap_content);
-        writeln("\t" + layout_height + wrap_content);
-    	writeln("\tandroid:text=" + text + " />");
-        numTabs = 0;
+        for (int i = 0; i < numTabs; i++) {
+            write("" + "\t");
+        }
+        writeln("<" + type);
+        writeIdWidthAndHeight(id);
+        writeTabbedLine("android:text=" + text + " />");
+        writeln("");
+    }
+    |
+    type=layoutType() name=name() id=id() (params=params())+ <EOL>
+    {
+        for (int i = 0; i < numTabs; i++) {
+            write("" + "\t");
+        }
+        writeln("<" + type);
+        writeIdWidthAndHeight(id);
+        writeMargins(params.split(","));
+        unclosedTags.push(type);
     }
     |
     type=layoutType() name=name() id=id() <EOL>
     {
+        for (int i = 0; i < numTabs; i++) {
+            write("" + "\t");
+        }
         writeln("<" + type);
-        writeln("\tandroid:id=\"@+id/" + id + "\"");
-        writeln("\t" + layout_width + wrap_content);
-        writeln("\t" + layout_height + wrap_content + ">");
+        writeIdWidthAndHeight(id);
+        writeln("");
         unclosedTags.push(type);
-        writeln("</" + type + ">");
-        numTabs = 0;
     }
     |
-    <CLICK> id=id() <EOL>
-    {
-        writeln(id + ".setOnClickListener(new View.OnClickListener() {");
-        writeln("@Override");
-        writeln("\tpublic void onClick(View v) {");
-        writeln("\t\t// Add click logic here...");
-        writeln("\t}");
-        writeln("});");
-        numTabs = 0;
-    }
-    |
-    <EOF>   { 
+    <EOF>   
+    { 
         close(); 
         System.exit(0); 
     }
@@ -158,11 +295,21 @@ String controlType():
     Token type;
 }
 {
-    type = <BUTTON> { return type.toString(); }
-    | type = <EDITTEXT> { return type.toString(); }
-    | type = <TEXTVIEW> { return type.toString(); }
-    | type = <LISTVIEW> { return type.toString(); }
-    | type = <RECYCLERVIEW> { return type.toString(); }
+    type = <BUTTON> { 
+        return type.toString(); 
+    }
+    | type = <EDITTEXT> { 
+        return type.toString(); 
+    }
+    | type = <TEXTVIEW> { 
+        return type.toString();
+    }
+    | type = <LISTVIEW> { 
+        return type.toString(); 
+    }
+    | type = <RECYCLERVIEW> { 
+        return type.toString(); 
+    }
 }
 
 String layoutType():
@@ -171,12 +318,13 @@ String layoutType():
 }
 {
     type = <RELLAYOUT> { 
-        processIndents(type);
         return type.toString(); 
     }
     | type = <LINLAYOUT> {
-        processIndents(type); 
         return type.toString(); 
+    }
+    | type = <FRMLAYOUT> {
+        return type.toString();
     }
 }
 
@@ -185,8 +333,12 @@ String name():
     Token name;
 }
 {
-    name = <VAR> { return name.toString(); }
-    | name = <TEXT> 
+    name = <VAR> 
+    { 
+        return name.toString(); 
+    }
+    | 
+    name = <TEXT> 
     { 
         System.out.println(badName); 
         return badName; 
@@ -198,8 +350,12 @@ String id():
     Token id;
 }
 {
-    id = <VAR> { return id.toString(); }
-    | id = <TEXT> 
+    id = <VAR> 
+    { 
+        return id.toString(); 
+    }
+    | 
+    id = <TEXT> 
     { 
         System.out.println(badId); 
         return badId; 
@@ -211,5 +367,24 @@ String controlText():
     Token text;
 }
 {
-    text = <TEXT> { return text.toString(); }
+    text = <TEXT> 
+    { 
+        return text.toString(); 
+    }
+}
+
+String params():
+{
+    Token params;
+}
+{
+    params = <MARGIN> 
+    { 
+        return params.toString(); 
+    }
+    |
+    params = <MARGIN1>
+    {
+        return params.toString();
+    }
 }
