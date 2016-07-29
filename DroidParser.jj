@@ -103,6 +103,7 @@ TOKEN:
     <HELP: "HELP">
     | <NUMBER: (<DIGIT>)+ ("."(<DIGIT>)+)?> 
     | <DIGIT: ["0"-"9"]> 
+    | <MARGIN: ("Margin") ((",") <NUMBER>){4}>
     | <BUTTON: "Button"> 
     | <EDITTEXT: "EditText"> 
     | <TEXTVIEW: "TextView"> 
@@ -110,7 +111,7 @@ TOKEN:
     | <RECYCLERVIEW: "RecyclerView">
     | <RELLAYOUT: "RelativeLayout"> 
     | <LINLAYOUT: "LinearLayout"> 
-    | <CLICK: "Click">
+    | <FRMLAYOUT: "FrameLayout">
     | <TEXT: ("\"")((["A"-"Z", "a"-"z", "0"-"9", " "])+)("\"")>
     | <VAR: (["A"-"Z", "a"-"z"]){1} (["A"-"Z", "a"-"z", "0"-"9"])*> 
     | <CLOSETAG: "/">
@@ -125,6 +126,7 @@ void parseNextLine():
     String name;
     String id;
     String text;
+    String params;
 }
 {
     <INDENT> type=controlType() name=name() id=id() text=controlText() <EOL>
@@ -165,6 +167,34 @@ void parseNextLine():
         writeTabbedLine(layout_height + wrap_content);
         writeTabbedLine("android:text=" + text + " />");
         writeln("");
+        writeln("</" + unclosedTags.pop() + ">");
+        writeln("");
+    }
+    |
+    <INDENTANDCLOSE> type=layoutType() name=name() id=id() (params=params())+ <EOL>
+    {
+        numTabs += 1;
+        for (int i = 0; i < numTabs; i++) {
+            write("" + "\t");
+        }
+        writeln("<" + type);
+        writeTabbedLine("android:id=\"@+id/" + id + "\"");
+        writeTabbedLine(layout_width + wrap_content);
+        writeTabbedLine(layout_height + wrap_content + ">");
+        String[] paramsArray = params.split(",");
+        String resolvedParam = "";
+        for (int i = 0; i < paramsArray.length; i++) { 
+            System.out.println(paramsArray[i]);
+            if (paramsArray[0].equals("Margin")) {
+                resolvedParam = "android:marginLeft=\"" + paramsArray[1] 
+                + "dp\"\n" + "android:marginTop=\"" + paramsArray[2] 
+                + "dp\"\n" + "android:marginRight=\"" + paramsArray[3] 
+                + "dp\"\n" "android:marginBottom=\"" + paramsArray[4] + "dp\"\n";
+            }
+        }
+        writeTabbedLine(resolvedParam);
+        writeln("");
+        unclosedTags.push(type);
         writeln("</" + unclosedTags.pop() + ">");
         writeln("");
     }
@@ -239,16 +269,6 @@ void parseNextLine():
         unclosedTags.push(type);
     }
     |
-    <CLICK> id=id() <EOL>
-    {
-        writeln(id + ".setOnClickListener(new View.OnClickListener() {");
-        writeln("@Override");
-        writeln("\tpublic void onClick(View v) {");
-        writeln("\t\t// Add click logic here...");
-        writeln("\t}");
-        writeln("});");
-    }
-    |
     <EOF>   
     { 
         close(); 
@@ -289,6 +309,9 @@ String layoutType():
     | type = <LINLAYOUT> {
         return type.toString(); 
     }
+    | type = <FRMLAYOUT> {
+        return type.toString();
+    }
 }
 
 String name():
@@ -323,4 +346,12 @@ String controlText():
 }
 {
     text = <TEXT> { return text.toString(); }
+}
+
+String params():
+{
+    Token params;
+}
+{
+    params = <MARGIN> { return params.toString(); }
 }

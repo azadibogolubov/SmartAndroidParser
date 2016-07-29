@@ -1,3 +1,1 @@
-/ LinearLayout someName someId
-RelativeLayout someName someId
-~ Button someBtn someId "some text"
+~ RelativeLayout someName someId234 Margin,15,20,5,30
