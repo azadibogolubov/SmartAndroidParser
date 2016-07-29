@@ -104,6 +104,7 @@ TOKEN:
     | <NUMBER: (<DIGIT>)+ ("."(<DIGIT>)+)?> 
     | <DIGIT: ["0"-"9"]> 
     | <MARGIN: ("Margin") ((",") <NUMBER>){4}>
+    | <MARGIN1: ("Margin") ((",") <NUMBER>){1}>
     | <BUTTON: "Button"> 
     | <EDITTEXT: "EditText"> 
     | <TEXTVIEW: "TextView"> 
@@ -140,6 +141,30 @@ void parseNextLine():
         writeTabbedLine(layout_height + wrap_content);
         writeTabbedLine("android:text=" + text + " />");
         writeln("");
+    }
+    |
+    <INDENT> type=layoutType() name=name() id=id() (params=params())+ <EOL>
+    {
+        numTabs += 1;
+        for (int i = 0; i < numTabs; i++) {
+            write("" + "\t");
+        }
+        writeln("<" + type);
+        writeTabbedLine("android:id=\"@+id/" + id + "\"");
+        writeTabbedLine(layout_width + wrap_content);
+        writeTabbedLine(layout_height + wrap_content + ">");
+        writeln("");
+        String[] paramsArray = params.split(",");
+        String resolvedParam = "";
+        for (int i = 0; i < paramsArray.length; i+=5) { 
+            if (paramsArray[0].equals("Margin")) {
+                writeTabbedLine("android:marginLeft=\"" + paramsArray[1] + "dp\"");
+                writeTabbedLine("android:marginTop=\"" + paramsArray[2] + "dp\""); 
+                writeTabbedLine("android:marginRight=\"" + paramsArray[3] + "dp\"");
+                writeTabbedLine("android:marginBottom=\"" + paramsArray[4] + "dp\" />");
+            }
+        }
+        unclosedTags.push(type);
     }
     |
     <INDENT> type=layoutType() name=name() id=id() <EOL>
@@ -183,17 +208,14 @@ void parseNextLine():
         writeTabbedLine(layout_height + wrap_content + ">");
         String[] paramsArray = params.split(",");
         String resolvedParam = "";
-        for (int i = 0; i < paramsArray.length; i++) { 
-            System.out.println(paramsArray[i]);
+        for (int i = 0; i < paramsArray.length; i+=5) { 
             if (paramsArray[0].equals("Margin")) {
-                resolvedParam = "android:marginLeft=\"" + paramsArray[1] 
-                + "dp\"\n" + "android:marginTop=\"" + paramsArray[2] 
-                + "dp\"\n" + "android:marginRight=\"" + paramsArray[3] 
-                + "dp\"\n" "android:marginBottom=\"" + paramsArray[4] + "dp\"\n";
+                writeTabbedLine("android:marginLeft=\"" + paramsArray[1] + "dp\"");
+                writeTabbedLine("android:marginTop=\"" + paramsArray[2] + "dp\""); 
+                writeTabbedLine("android:marginRight=\"" + paramsArray[3] + "dp\"");
+                writeTabbedLine("android:marginBottom=\"" + paramsArray[4] + "dp\" />");
             }
         }
-        writeTabbedLine(resolvedParam);
-        writeln("");
         unclosedTags.push(type);
         writeln("</" + unclosedTags.pop() + ">");
         writeln("");
@@ -254,6 +276,29 @@ void parseNextLine():
         writeTabbedLine(layout_height + wrap_content);
         writeTabbedLine("android:text=" + text + " />");
         writeln("");
+    }
+    |
+    type=layoutType() name=name() id=id() (params=params())+ <EOL>
+    {
+        for (int i = 0; i < numTabs; i++) {
+            write("" + "\t");
+        }
+        writeln("<" + type);
+        writeTabbedLine("android:id=\"@+id/" + id + "\"");
+        writeTabbedLine(layout_width + wrap_content);
+        writeTabbedLine(layout_height + wrap_content + ">");
+        writeln("");
+        String[] paramsArray = params.split(",");
+        String resolvedParam = "";
+        for (int i = 0; i < paramsArray.length; i+=5) { 
+            if (paramsArray[0].equals("Margin")) {
+                writeTabbedLine("android:marginLeft=\"" + paramsArray[1] + "dp\"");
+                writeTabbedLine("android:marginTop=\"" + paramsArray[2] + "dp\""); 
+                writeTabbedLine("android:marginRight=\"" + paramsArray[3] + "dp\"");
+                writeTabbedLine("android:marginBottom=\"" + paramsArray[4] + "dp\" />");
+            }
+        }
+        unclosedTags.push(type);
     }
     |
     type=layoutType() name=name() id=id() <EOL>
@@ -319,8 +364,12 @@ String name():
     Token name;
 }
 {
-    name = <VAR> { return name.toString(); }
-    | name = <TEXT> 
+    name = <VAR> 
+    { 
+        return name.toString(); 
+    }
+    | 
+    name = <TEXT> 
     { 
         System.out.println(badName); 
         return badName; 
@@ -332,8 +381,12 @@ String id():
     Token id;
 }
 {
-    id = <VAR> { return id.toString(); }
-    | id = <TEXT> 
+    id = <VAR> 
+    { 
+        return id.toString(); 
+    }
+    | 
+    id = <TEXT> 
     { 
         System.out.println(badId); 
         return badId; 
@@ -345,7 +398,10 @@ String controlText():
     Token text;
 }
 {
-    text = <TEXT> { return text.toString(); }
+    text = <TEXT> 
+    { 
+        return text.toString(); 
+    }
 }
 
 String params():
@@ -353,5 +409,13 @@ String params():
     Token params;
 }
 {
-    params = <MARGIN> { return params.toString(); }
+    params = <MARGIN> 
+    { 
+        return params.toString(); 
+    }
+    |
+    params = <MARGIN1>
+    {
+        return params.toString();
+    }
 }
