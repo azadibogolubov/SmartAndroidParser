@@ -147,18 +147,8 @@ void parseNextLine():
     String params;
 }
 {
-    <INDENT> type=controlType() name=name() id=id() text=controlText() <EOL>
-    {
-        numTabs += 1;
-        for (int i = 0; i < numTabs; i++) {
-            write("" + "\t");
-        }
-        writeln("<" + type);
-        writeIdWidthAndHeight(id);
-        writeTabbedLine("android:text=" + text + " />");
-        writeln("");
-    }
-    |
+    // ********** Layouts **************
+    // Indent (\)
     <INDENT> type=layoutType() name=name() id=id() (params=params())+ <EOL>
     {
         numTabs += 1;
@@ -182,19 +172,7 @@ void parseNextLine():
         unclosedTags.push(type);
     }
     |
-    <INDENTANDCLOSE> type=controlType() name=name() id=id() text=controlText() <EOL>
-    {
-        numTabs += 1;
-        for (int i = 0; i < numTabs; i++) {
-            write("" + "\t");
-        }
-        writeln("<" + type);
-        writeIdWidthAndHeight(id);
-        writeln("");
-        writeln("</" + unclosedTags.pop() + ">");
-        writeln("");
-    }
-    |
+    // Indent and Close (~)
     <INDENTANDCLOSE> type=layoutType() name=name() id=id() (params=params())+ <EOL>
     {
         numTabs += 1;
@@ -225,18 +203,7 @@ void parseNextLine():
         writeln("");
     }
     |
-    <CLOSETAG> type=controlType() name=name() id=id() text=controlText() <EOL>
-    {
-        for (int i = 0; i < numTabs; i++) {
-            write("" + "\t");
-        }
-        writeln("<" + type);
-        writeIdWidthAndHeight(id);
-        writeln("");
-        writeln("</" + unclosedTags.pop() + ">");
-        writeln("");
-    }
-    |
+    // Self Closing (/)
     <CLOSETAG> type=layoutType() name=name() id=id() <EOL>
     {
         for (int i = 0; i < numTabs; i++) {
@@ -250,17 +217,7 @@ void parseNextLine():
         writeln("");
     }
     |
-    type=controlType() name=name() id=id() text=controlText() <EOL>
-    {
-        for (int i = 0; i < numTabs; i++) {
-            write("" + "\t");
-        }
-        writeln("<" + type);
-        writeIdWidthAndHeight(id);
-        writeTabbedLine("android:text=" + text + " />");
-        writeln("");
-    }
-    |
+    // Layout with margins
     type=layoutType() name=name() id=id() (params=params())+ <EOL>
     {
         for (int i = 0; i < numTabs; i++) {
@@ -272,6 +229,7 @@ void parseNextLine():
         unclosedTags.push(type);
     }
     |
+    // Generic Layout
     type=layoutType() name=name() id=id() <EOL>
     {
         for (int i = 0; i < numTabs; i++) {
@@ -281,6 +239,55 @@ void parseNextLine():
         writeIdWidthAndHeight(id);
         writeln("");
         unclosedTags.push(type);
+    }
+    |
+    // ********** Controls **************
+    <INDENT> type=controlType() name=name() id=id() text=controlText() <EOL>
+    {
+        numTabs += 1;
+        for (int i = 0; i < numTabs; i++) {
+            write("" + "\t");
+        }
+        writeln("<" + type);
+        writeIdWidthAndHeight(id);
+        writeTabbedLine("android:text=" + text + " />");
+        writeln("");
+    }
+    |
+    <INDENTANDCLOSE> type=controlType() name=name() id=id() text=controlText() <EOL>
+    {
+        numTabs += 1;
+        for (int i = 0; i < numTabs; i++) {
+            write("" + "\t");
+        }
+        writeln("<" + type);
+        writeIdWidthAndHeight(id);
+        writeln("");
+        writeln("</" + unclosedTags.pop() + ">");
+        writeln("");
+    }
+    |
+    <CLOSETAG> type=controlType() name=name() id=id() text=controlText() <EOL>
+    {
+        for (int i = 0; i < numTabs; i++) {
+            write("" + "\t");
+        }
+        writeln("<" + type);
+        writeIdWidthAndHeight(id);
+        writeln("");
+        writeln("</" + unclosedTags.pop() + ">");
+        writeln("");
+    }
+    |
+    type=controlType() name=name() id=id() text=controlText() <EOL>
+    {
+        for (int i = 0; i < numTabs; i++) {
+            write("" + "\t");
+        }
+        writeln("<" + type);
+        writeIdWidthAndHeight(id);
+        writeTabbedLine("android:text=" + text + " />");
+        writeln("");
     }
     |
     <EOF>   
