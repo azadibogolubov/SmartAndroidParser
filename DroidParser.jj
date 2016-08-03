@@ -91,28 +91,19 @@ public class DroidParser {
         }
     }
 
-    private static void writeMargins(String[] margins) {
-        for (int i = 0; i < margins.length; i+=5) { 
-            writeTabbedLine("android:marginLeft=\"" + margins[1] + "dp\"");
-            writeTabbedLine("android:marginTop=\"" + margins[2] + "dp\""); 
-            writeTabbedLine("android:marginRight=\"" + margins[3] + "dp\"");
-            writeTabbedLine("android:marginBottom=\"" + margins[4] + "dp\" />");
-        }
-    }
-
-    private static void writePadding(String[] margins) {
-        for (int i = 0; i < margins.length; i+=5) { 
-            writeTabbedLine("android:paddingLeft=\"" + margins[1] + "dp\"");
-            writeTabbedLine("android:paddingTop=\"" + margins[2] + "dp\""); 
-            writeTabbedLine("android:paddingRight=\"" + margins[3] + "dp\"");
-            writeTabbedLine("android:paddingBottom=\"" + margins[4] + "dp\" />");
+    private static void writeFormatting(String type, String[] qualifier) {
+        for (int i = 0; i < qualifier.length; i+=5) { 
+            writeTabbedLine("android:" + type + "Left=\"" + qualifier[1] + "dp\"");
+            writeTabbedLine("android:" + type + "Top=\"" + qualifier[2] + "dp\""); 
+            writeTabbedLine("android:" + type + "Right=\"" + qualifier[3] + "dp\"");
+            writeTabbedLine("android:" + type + "Bottom=\"" + qualifier[4] + "dp\" />");
         }
     }
 
     private static void writeIdWidthAndHeight(String id) {
         writeTabbedLine("android:id=\"@+id/" + id + "\"");
         writeTabbedLine(layout_width + wrap_content);
-        writeTabbedLine(layout_height + wrap_content + ">");
+        writeTabbedLine(layout_height + wrap_content);
     }
 }
  
@@ -157,6 +148,10 @@ void parseNextLine():
     String args;
 }
 {
+    <CLOSETAG> <EOL>
+    {
+        writeln("</" + unclosedTags.pop() + ">");
+    }
     // ********** Layouts **************
     // Indent (\)
     <INDENT> type=layoutType() name=name() id=id() (params=params() args=args())+ <EOL>
@@ -167,7 +162,7 @@ void parseNextLine():
         }
         writeln("<" + type);
         writeIdWidthAndHeight(id);
-        writeMargins(args.split(","));
+        writeFormatting(params.toLowerCase(), args.split(","));
         unclosedTags.push(type);
     }
     |
@@ -193,7 +188,7 @@ void parseNextLine():
 
         String[] paramsArray = args.split(",");
         String resolvedParam = "";
-        writeMargins(args.split(","));
+        writeFormatting(params.toLowerCase(), args.split(","));
         unclosedTags.push(type);
         writeln("</" + unclosedTags.pop() + ">");
         writeln("");
@@ -235,12 +230,7 @@ void parseNextLine():
         }
         writeln("<" + type);
         writeIdWidthAndHeight(id);
-        if (params.equals("Margin")) {
-            writeMargins(args.split(","));
-        }
-        else if (params.equals("Padding")) {
-            writePadding(args.split(","));
-        }
+        writeFormatting(params.toLowerCase(), args.split(","));
         unclosedTags.push(type);
     }
     |
