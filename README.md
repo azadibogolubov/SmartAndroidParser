@@ -10,14 +10,16 @@ Sample script entries include:
 A valid script might look like the following:
 ```
 LinearLayout someId
-	Button someId "some text"
-	Textview someId "some text"
- 	RelativeLayout someId
-		Button someId "some text"
-		Button someId "some text"
+~ Button someId "some text"
+~ Textview someId "some text"
+\ RelativeLayout someId
+~ Button someId "some text"
+~ Button someId "some text" Margin,10,20,10,20
+/
+/
 ```
 
-This will ideally generate the following XML:
+Will generate the following XML:
 
 ```xml
 <LinearLayout
@@ -53,7 +55,11 @@ This will ideally generate the following XML:
 			android:id="@+id/someId"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:text="some text" />
+			android:text="some text"
+			android:layout_marginLeft="10dp"
+			android:layout_marginTop="20dp" 
+			android:layout_marginRight="20dp"
+			android:layout_marginBottom="10dp"/>
 	</RelativeLayout>
 <LinearLayout>	
 ```
