@@ -305,6 +305,10 @@ void parseNextLine():
         writeln("");
     }
     |
+    <CLOSETAG> <EOL>
+    {
+        writeln("</" + unclosedTags.pop() + ">");
+    }
     <EOF>   
     { 
         close(); 
