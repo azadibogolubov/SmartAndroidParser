@@ -1,7 +1,7 @@
 <RelativeLayout
 	android:id="@+id/someId234"
 	android:layout_width="wrap_content"
-	android:layout_height="wrap_content">
+	android:layout_height="wrap_content"
 	android:marginLeft="15dp"
 	android:marginTop="20dp"
 	android:marginRight="5dp"
@@ -9,7 +9,7 @@
 <LinearLayout
 	android:id="@+id/someLLId"
 	android:layout_width="wrap_content"
-	android:layout_height="wrap_content">
+	android:layout_height="wrap_content"
 	android:paddingLeft="10dp"
 	android:paddingTop="20dp"
 	android:paddingRight="10dp"
@@ -17,6 +17,6 @@
 <Button
 	android:id="@+id/someBtnId"
 	android:layout_width="wrap_content"
-	android:layout_height="wrap_content">
+	android:layout_height="wrap_content"
 	android:text="someText" />
 
