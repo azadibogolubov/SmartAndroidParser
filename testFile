@@ -1,3 +1,7 @@
-RelativeLayout someName someId234 Margin,15,20,5,30
-LinearLayout someLL someLLId Padding,10,20,10,20
-Button someBtnName someBtnId "someText"
+LinearLayout someId234 Margin,15,20,5,30
+' LinearLayout someLLId Padding,10,20,10,20
+' TextView someTv "some text"
+EditText someOtherTv "some tv"
+Button someBtn "some text"
+/
+/

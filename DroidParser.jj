@@ -24,6 +24,7 @@ public class DroidParser {
     static String layout_height = "android:layout_height=";
     static String wrap_content = "\"wrap_content\"";
     static String match_parent = "\"match_parent\"";
+    static boolean firstElement = true;
 
     public static void main(String[] args) throws ParseException {
         try {
@@ -93,10 +94,13 @@ public class DroidParser {
 
     private static void writeFormatting(String type, String[] qualifier) {
         for (int i = 0; i < qualifier.length; i+=5) { 
+            if (type.equals("margin")) {
+                type = "layout_" + type;
+            }
             writeTabbedLine("android:" + type + "Left=\"" + qualifier[1] + "dp\"");
             writeTabbedLine("android:" + type + "Top=\"" + qualifier[2] + "dp\""); 
             writeTabbedLine("android:" + type + "Right=\"" + qualifier[3] + "dp\"");
-            writeTabbedLine("android:" + type + "Bottom=\"" + qualifier[4] + "dp\" />");
+            writeTabbedLine("android:" + type + "Bottom=\"" + qualifier[4] + "dp\" >");
         }
     }
 
@@ -104,6 +108,54 @@ public class DroidParser {
         writeTabbedLine("android:id=\"@+id/" + id + "\"");
         writeTabbedLine(layout_width + wrap_content);
         writeTabbedLine(layout_height + wrap_content);
+    }
+
+    private static void writeIdWidthAndHeight(String id, String endTag) {
+        writeTabbedLine("android:id=\"@+id/" + id + "\"");
+        writeTabbedLine(layout_width + wrap_content);
+        writeTabbedLine(layout_height + wrap_content + endTag);
+    }
+
+    private static void createDialog(String id) {
+        writeln("<LinearLayout");
+        writeTabbedLine("xmlns:android=\"http://schemas.android.com/apk/res/android\"");
+        writeTabbedLine("android:orientation=\"vertical\"");
+        writeIdWidthAndHeight(id, ">");
+
+        writeln("");
+
+        writeTabbedLine("<TextView");
+
+        numTabs += 1;
+
+        writeTabbedLine("android:id=\"@+id/option1\"");
+        writeTabbedLine("android:layout_width=\"match_parent\"");
+        writeTabbedLine("android:layout_height=\"wrap_content\"");
+        writeTabbedLine("android:text=\"Option 1\"");
+        writeTabbedLine("android:textSize=\"16sp\">");
+
+        writeln("");
+        numTabs -= 1;
+        writeTabbedLine("<TextView");
+        numTabs += 1;
+        writeTabbedLine("android:id=\"@+id/option2\"");
+        writeTabbedLine("android:layout_width=\"match_parent\"");
+        writeTabbedLine("android:layout_height=\"wrap_content\"");
+        writeTabbedLine("android:text=\"Option 2\"");
+        writeTabbedLine("android:textSize=\"16sp\">");
+
+        writeln("");
+        numTabs -= 1;
+        writeTabbedLine("<TextView");
+        numTabs += 1;
+        writeTabbedLine("android:id=\"@+id/cancel\"");
+        writeTabbedLine("android:layout_width=\"match_parent\"");
+        writeTabbedLine("android:layout_height=\"wrap_content\"");
+        writeTabbedLine("android:text=\"Cancel\"");
+        writeTabbedLine("android:textSize=\"16sp\"");
+        writeTabbedLine("android:layout_gravity=\"right\">");        
+
+        writeln("</LinearLayout>");
     }
 }
  
@@ -129,6 +181,7 @@ TOKEN:
     | <RELLAYOUT: "RelativeLayout"> 
     | <LINLAYOUT: "LinearLayout"> 
     | <FRMLAYOUT: "FrameLayout">
+    | <DIALOG: "Dialog">
     | <TEXT: ("\"")((["A"-"Z", "a"-"z", "0"-"9", " "])+)("\"")>
     | <VAR: (["A"-"Z", "a"-"z"]){1} (["A"-"Z", "a"-"z", "0"-"9"])*> 
     | <ARGS: ("," <DIGIT>){4}>
@@ -150,41 +203,69 @@ void parseNextLine():
 {
     <CLOSETAG> <EOL>
     {
-        writeln("</" + unclosedTags.pop() + ">");
+        numTabs -= 1;
+        if (unclosedTags.size() > 1) {
+            writeTabbedLine("</" + unclosedTags.pop() + ">");
+        }
+        else {
+            writeln("</" + unclosedTags.pop() + ">");
+        }
     }
+    |
     // ********** Layouts **************
     // Indent (\)
-    <INDENT> type=layoutType() name=name() id=id() (params=params() args=args())+ <EOL>
+    <INDENT> type=layoutType() id=id() (params=params() args=args())+ <EOL>
     {
         numTabs += 1;
         for (int i = 0; i < numTabs; i++) {
             write("" + "\t");
         }
         writeln("<" + type);
+
+        if (firstElement) {
+            writeTabbedLine("xmlns:android=\"http://schemas.android.com/apk/res/android\"");
+            firstElement = false;
+        }
+
+        if (type.equals("LinearLayout")) {
+            writeTabbedLine("android:orientation=\"vertical\"");
+        }
+
         writeIdWidthAndHeight(id);
         writeFormatting(params.toLowerCase(), args.split(","));
         unclosedTags.push(type);
     }
     |
-    <INDENT> type=layoutType() name=name() id=id() <EOL>
+    <INDENT> type=layoutType() id=id() <EOL>
     {
         numTabs += 1;
         for (int i = 0; i < numTabs; i++) {
             write("" + "\t");
         }
         writeln("<" + type);
+
+        if (firstElement) {
+            writeTabbedLine("xmlns:android=\"http://schemas.android.com/apk/res/android\"");
+            firstElement = false;
+        }
+
         writeIdWidthAndHeight(id);
         unclosedTags.push(type);
     }
     |
     // Indent and Close (~)
-    <INDENTANDCLOSE> type=layoutType() name=name() id=id() (params=params() args=args())+ <EOL>
+    <INDENTANDCLOSE> type=layoutType() id=id() (params=params() args=args())+ <EOL>
     {
         numTabs += 1;
         for (int i = 0; i < numTabs; i++) {
             write("" + "\t");
         }
         writeln("<" + type);
+
+        if (firstElement) {
+            writeTabbedLine("xmlns:android=\"http://schemas.android.com/apk/res/android\"");
+            firstElement = false;
+        }
 
         String[] paramsArray = args.split(",");
         String resolvedParam = "";
@@ -194,13 +275,19 @@ void parseNextLine():
         writeln("");
     }
     |
-    <INDENTANDCLOSE> type=layoutType() name=name() id=id() <EOL>
+    <INDENTANDCLOSE> type=layoutType() id=id() <EOL>
     {
         numTabs += 1;
         for (int i = 0; i < numTabs; i++) {
             write("" + "\t");
         }
         writeln("<" + type);
+
+        if (firstElement) {
+            writeTabbedLine("xmlns:android=\"http://schemas.android.com/apk/res/android\"");
+            firstElement = false;
+        }
+
         writeIdWidthAndHeight(id);
         writeln("");
         unclosedTags.push(type);
@@ -209,12 +296,18 @@ void parseNextLine():
     }
     |
     // Self Closing (/)
-    <CLOSETAG> type=layoutType() name=name() id=id() <EOL>
+    <CLOSETAG> type=layoutType() id=id() <EOL>
     {
         for (int i = 0; i < numTabs; i++) {
             write("" + "\t");
         }
         writeln("<" + type);
+
+        if (firstElement) {
+            writeTabbedLine("xmlns:android=\"http://schemas.android.com/apk/res/android\"");
+            firstElement = false;
+        }
+
         writeIdWidthAndHeight(id);
         writeln("");
         unclosedTags.push(type);
@@ -223,23 +316,35 @@ void parseNextLine():
     }
     |
     // Layout with margins
-    type=layoutType() name=name() id=id() (params=params() args=args())+ <EOL>
+    type=layoutType() id=id() (params=params() args=args())+ <EOL>
     {
         for (int i = 0; i < numTabs; i++) {
             write("" + "\t");
         }
         writeln("<" + type);
+
+        if (firstElement) {
+            writeTabbedLine("xmlns:android=\"http://schemas.android.com/apk/res/android\"");
+            firstElement = false;
+        }
+
         writeIdWidthAndHeight(id);
         writeFormatting(params.toLowerCase(), args.split(","));
         unclosedTags.push(type);
     }
     |
     // Generic Layout
-    type=layoutType() name=name() id=id() <EOL>
+    type=layoutType() id=id() <EOL>
     {
         for (int i = 0; i < numTabs; i++) {
             write("" + "\t");
         }
+
+        if (firstElement) {
+            writeTabbedLine("xmlns:android=\"http://schemas.android.com/apk/res/android\"");
+            firstElement = false;
+        }
+
         writeln("<" + type);
         writeIdWidthAndHeight(id);
         writeln("");
@@ -247,7 +352,7 @@ void parseNextLine():
     }
     |
     // ********** Controls **************
-    <INDENT> type=controlType() name=name() id=id() text=controlText() <EOL>
+    <INDENT> type=controlType() id=id() text=controlText() <EOL>
     {
         numTabs += 1;
         for (int i = 0; i < numTabs; i++) {
@@ -259,7 +364,7 @@ void parseNextLine():
         writeln("");
     }
     |
-    <INDENTANDCLOSE> type=controlType() name=name() id=id() text=controlText() <EOL>
+    <INDENTANDCLOSE> type=controlType() id=id() text=controlText() <EOL>
     {
         numTabs += 1;
         for (int i = 0; i < numTabs; i++) {
@@ -272,7 +377,7 @@ void parseNextLine():
         writeln("");
     }
     |
-    <CLOSETAG> type=controlType() name=name() id=id() text=controlText() <EOL>
+    <CLOSETAG> type=controlType() id=id() text=controlText() <EOL>
     {
         for (int i = 0; i < numTabs; i++) {
             write("" + "\t");
@@ -284,7 +389,7 @@ void parseNextLine():
         writeln("");
     }
     |
-    type=controlType() name=name() id=id() text=controlText() <EOL>
+    type=controlType() id=id() text=controlText() <EOL>
     {
         for (int i = 0; i < numTabs; i++) {
             write("" + "\t");
