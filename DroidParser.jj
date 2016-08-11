@@ -188,6 +188,7 @@ TOKEN:
     | <CLOSETAG: "/">
     | <INDENT: "\'">
     | <INDENTANDCLOSE: "~">
+    | <FILE: ("-- " <TEXT>)>
     | <EOL: "\n">
 }
  
@@ -199,8 +200,19 @@ void parseNextLine():
     String text;
     String params;
     String args;
+    String fileName;
 }
 {
+    <EOL>
+    {
+
+    }
+    |
+    fileName=fileName() <EOL>
+    {
+        System.out.println("File: " + fileName);
+    }
+    |
     <CLOSETAG> <EOL>
     {
         numTabs -= 1;
@@ -515,4 +527,17 @@ String args():
     {
         return args.toString();
     }   
+}
+
+String fileName():
+{
+    Token fileName;
+}
+{
+    fileName = <FILE>
+    {
+        String result = fileName.toString().substring(4);
+        result = result.substring(0, result.length()-1);
+        return result;
+    }
 }

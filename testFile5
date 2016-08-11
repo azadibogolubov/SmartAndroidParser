@@ -1,0 +1,7 @@
+-- "file1"
+LinearLayout someId
+' TextView someTv "Email"
+TextView someCoolName "Print"
+/
+
+-- "file2"

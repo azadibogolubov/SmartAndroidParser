@@ -1,0 +1,4 @@
+LinearLayout someId
+' TextView someTv "Email"
+TextView someCoolName "Print"
+/
