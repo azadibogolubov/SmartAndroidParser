@@ -5,40 +5,57 @@ options {
 PARSER_BEGIN(DroidParser)
 import java.io.*;
 import java.util.*;
+import java.nio.file.Paths;
 
 public class DroidParser {
-    static int numTabs;
+    // ADTs
     static Stack<String> unclosedTags;
     static File file;
     static FileWriter fw;
     static BufferedWriter bw;
-    static ArrayList<String> indents;
 
+    // Error Strings
     static String badId = "ERROR: Bad ID";
     static String badName = "ERROR: Bad Name";
     static String needFileName = "Please provide file name in arguments list...";
     static String couldNotProcessFile = "DroidParser: The file was not able to be processed...";
     static String bwError = "IOException: BufferedWriter error...";
     static String closeWriterError = "Could not close writer...";
+
+    // Resource strings
     static String layout_width = "android:layout_width=";
     static String layout_height = "android:layout_height=";
     static String wrap_content = "\"wrap_content\"";
     static String match_parent = "\"match_parent\"";
+
+    // Primitives
     static boolean firstElement = true;
+    static int numTabs;
+
+    // Home directory
+    static String homeDir;
 
     public static void main(String[] args) throws ParseException {
         try {
+            // Number of tabs
             numTabs = 0;
+
+            // Stack of unclosed tags
             unclosedTags = new Stack<String>();
+
+            // TODO: Remove file specifier and use separator tag.
             file = new File(args[1]);
             fw = new FileWriter(file.getAbsoluteFile());
-            bw = new BufferedWriter(fw);
-            indents = new ArrayList<String>();
 
+            // Buffered writer for writing output to file(s).
+            bw = new BufferedWriter(fw);
+
+            // TODO: Remove this requirement, as want to be able to specify file names in the actual script.
             if (args.length == 0) {
                 System.out.println(needFileName);
             }
             else {
+                // Try to parse the input script.
                 try {
                     DroidParser parser = new DroidParser(new FileInputStream(args[0]));
                     while (true) {
@@ -46,31 +63,38 @@ public class DroidParser {
                     }
                 }
                 catch (FileNotFoundException e) {
-                    System.out.println();
+                    System.out.println(couldNotProcessFile);
                     return;
                 }
             }   
         }
         catch (IOException e) {
-            System.out.println(bwError);
+            System.err.println(bwError);
         }
     }
 
+    // Write input to file, similar to print.
     private static void write(String input) {
         try {
             bw.write(input);
         }
-        catch (IOException e) {}
+        catch (IOException e) {
+            System.err.println(bwError);
+        }
     }
 
+    // Write input to file, similar to println.
     private static void writeln(String input) {
         try {
             bw.write(input);
             bw.newLine();
         }
-        catch (IOException e) {}
+        catch (IOException e) {
+            System.err.println(bwError);
+        }
     }
 
+    // Write a line with tabs as needed.
     private static void writeTabbedLine(String input) {
         try {
             for (int i = 0; i < numTabs; i++) {
@@ -83,6 +107,7 @@ public class DroidParser {
         catch (IOException e) {}
     }
 
+    // Close the buffered writer.
     private static void close() {
         try {
             bw.close();
@@ -92,6 +117,7 @@ public class DroidParser {
         }
     }
 
+    // Write out the formatting for margins/padding.
     private static void writeFormatting(String type, String[] qualifier) {
         for (int i = 0; i < qualifier.length; i+=5) { 
             if (type.equals("margin")) {
@@ -104,18 +130,21 @@ public class DroidParser {
         }
     }
 
+    // Write out boilerplate id, width, and height.
     private static void writeIdWidthAndHeight(String id) {
         writeTabbedLine("android:id=\"@+id/" + id + "\"");
         writeTabbedLine(layout_width + wrap_content);
         writeTabbedLine(layout_height + wrap_content);
     }
 
+    // Write out boilerplate id, width, and height, with an endtag.
     private static void writeIdWidthAndHeight(String id, String endTag) {
         writeTabbedLine("android:id=\"@+id/" + id + "\"");
         writeTabbedLine(layout_width + wrap_content);
         writeTabbedLine(layout_height + wrap_content + endTag);
     }
 
+    // Write out boilerplate XML dialog code.
     private static void createDialog(String id) {
         writeln("<LinearLayout");
         writeTabbedLine("xmlns:android=\"http://schemas.android.com/apk/res/android\"");
@@ -168,9 +197,11 @@ SKIP:
  
 TOKEN:
 {
-    <HELP: "HELP">
-    | <NUMBER: (<DIGIT>)+ ("."(<DIGIT>)+)?> 
+    // Digits
+    <NUMBER: (<DIGIT>)+ ("."(<DIGIT>)+)?> 
     | <DIGIT: (["0"-"9"])+> 
+    
+    // XML
     | <MARGIN: "Margin">
     | <PADDING: "Padding">
     | <BUTTON: "Button"> 
@@ -180,22 +211,35 @@ TOKEN:
     | <RECYCLERVIEW: "RecyclerView">
     | <RELLAYOUT: "RelativeLayout"> 
     | <LINLAYOUT: "LinearLayout"> 
+    | <TV: "TV">
+    | <ET: "ET">
+    | <RL: "RL">
+    | <LL: "LL">
+    | <FAB: "FAB">
+    | <BTN: "BTN">
+    | <LV: "LV">
+    | <RV: "RV">
     | <FRMLAYOUT: "FrameLayout">
     | <DIALOG: "Dialog">
     
+    // Java
     | <NEWACTIVITY: "NewActivity">
     | <ENDFUNCTION: "End">
     | <ONCREATE: "OnCreate">
-
+    
+    // Event Handlers
     | <CLICK: "Click">
-
+    
+    // Text
     | <TEXT: ("\"")((["A"-"Z", "a"-"z", "0"-"9", " "])+)("\"")>
     | <VAR: (["A"-"Z", "a"-"z"]){1} (["A"-"Z", "a"-"z", "0"-"9"])*> 
+    
+    // Other
     | <ARGS: ("," <DIGIT>){4}>
     | <CLOSETAG: "/">
     | <INDENT: "\'">
     | <INDENTANDCLOSE: "~">
-    | <FILE: ("-- " <TEXT>)>
+    | <FILE: ("-- " <VAR> "." <VAR>)>
     | <EOL: "\n">
 }
  
@@ -210,43 +254,62 @@ void parseNextLine():
     String fileName;
 }
 {
-    <EOL>
+    <EOL> {}
+    
+    // File name
+    | fileName=fileName() <EOL>
     {
+        try {
+            firstElement = true;
+            bw.close();
+            file = new File(fileName);
+
+            fw = new FileWriter(file.getAbsoluteFile());
+
+            // Buffered writer for writing output to file(s).
+            bw = new BufferedWriter(fw);
+        } catch (IOException e) { 
+            System.err.println("Could not open file for writing...");
+        }
     }
-    |
-    <NEWACTIVITY> <EOL>
+
+    // New activity specifier (Java)
+    | <NEWACTIVITY> <EOL>
     {
-        System.out.println("public class newClass extends Activity {");
+        writeln("public class newClass extends Activity {");
     }
-    |
-    <ONCREATE> <EOL>
+
+    // On create code (Java)
+    | <ONCREATE> <EOL>
     {
-        System.out.println("\t@Override");
-        System.out.println("\tpublic void onCreate(Bundle savedInstanceState) {");
-        System.out.println("\t\tsuper.onCreate(savedInstanceState)");
-        System.out.println("\t}");
+        writeln("\t@Override");
+        writeln("\tpublic void onCreate(Bundle savedInstanceState) {");
+        writeln("\t\tsuper.onCreate(savedInstanceState);");
     }
-    |
-    <ENDFUNCTION> <EOL>
+
+    // Close a function (Java)
+    | <ENDFUNCTION> <EOL> 
     {
-        System.out.println("}");
+        numTabs--;
+        if (numTabs > 0) {
+            writeTabbedLine("}");
+        } else {
+            writeln("}");
+        }
     }
-    |
-    <CLICK> <EOL>
+
+    // Click handler (Java)
+    | <CLICK> id=id() <EOL>
     {
-        System.out.println("\tcontrol.setOnClickListener(new View.OnClickListener() {");
-        System.out.println("\t\t@Override");
-        System.out.println("\t\tpublic void onClick(View v) {");
-        System.out.println("\t\t\t// Add click listener logic...");
-        System.out.println("\t\t}");
+        writeTabbedLine(id + ".setOnClickListener(new View.OnClickListener() {");
+        writeTabbedLine("\t@Override");
+        writeTabbedLine("\tpublic void onClick(View v) {");
+        writeTabbedLine("\t\t// Add click listener logic...");
+        writeTabbedLine("}");
     }
-    |
-    fileName=fileName() <EOL>
-    {
-        System.out.println("File: " + fileName);
-    }
-    |
-    <CLOSETAG> <EOL>
+
+    // Close current tag.
+    | <CLOSETAG> <EOL>
     {
         numTabs -= 1;
         if (unclosedTags.size() > 1) {
@@ -256,10 +319,10 @@ void parseNextLine():
             writeln("</" + unclosedTags.pop() + ">");
         }
     }
-    |
+
     // ********** Layouts **************
     // Indent (\)
-    <INDENT> type=layoutType() id=id() (params=params() args=args())+ <EOL>
+    | <INDENT> type=layoutType() id=id() (params=params() args=args())+ <EOL>
     {
         numTabs += 1;
         for (int i = 0; i < numTabs; i++) {
@@ -278,10 +341,12 @@ void parseNextLine():
 
         writeIdWidthAndHeight(id);
         writeFormatting(params.toLowerCase(), args.split(","));
+        write(">");
         unclosedTags.push(type);
     }
-    |
-    <INDENT> type=layoutType() id=id() <EOL>
+
+    // Indent followed by a layout and an id
+    | <INDENT> type=layoutType() id=id() <EOL>
     {
         numTabs += 1;
         for (int i = 0; i < numTabs; i++) {
@@ -295,11 +360,12 @@ void parseNextLine():
         }
 
         writeIdWidthAndHeight(id);
+        write(">");
         unclosedTags.push(type);
     }
-    |
-    // Indent and Close (~)
-    <INDENTANDCLOSE> type=layoutType() id=id() (params=params() args=args())+ <EOL>
+
+    // Indent, layout, id, margin/padding and Close (~)
+    | <INDENTANDCLOSE> type=layoutType() id=id() (params=params() args=args())+ <EOL>
     {
         numTabs += 1;
         for (int i = 0; i < numTabs; i++) {
@@ -319,8 +385,9 @@ void parseNextLine():
         writeln("</" + unclosedTags.pop() + ">");
         writeln("");
     }
-    |
-    <INDENTANDCLOSE> type=layoutType() id=id() <EOL>
+    
+    // Indent, layout, id, and close.
+    | <INDENTANDCLOSE> type=layoutType() id=id() <EOL>
     {
         numTabs += 1;
         for (int i = 0; i < numTabs; i++) {
@@ -339,9 +406,9 @@ void parseNextLine():
         writeln("</" + unclosedTags.pop() + ">");
         writeln("");
     }
-    |
-    // Self Closing (/)
-    <CLOSETAG> type=layoutType() id=id() <EOL>
+
+    // Self Closing, layout, id (/)
+    | <CLOSETAG> type=layoutType() id=id() <EOL>
     {
         for (int i = 0; i < numTabs; i++) {
             write("" + "\t");
@@ -359,45 +426,45 @@ void parseNextLine():
         writeln("</" + unclosedTags.pop() + ">");
         writeln("");
     }
-    |
-    // Layout with margins
-    type=layoutType() id=id() (params=params() args=args())+ <EOL>
+
+    // Layout, id, padding/margins
+    | type=layoutType() id=id() (params=params() args=args())+ <EOL>
     {
         for (int i = 0; i < numTabs; i++) {
             write("" + "\t");
         }
         writeln("<" + type);
-
         if (firstElement) {
             writeTabbedLine("xmlns:android=\"http://schemas.android.com/apk/res/android\"");
             firstElement = false;
         }
-
         writeIdWidthAndHeight(id);
         writeFormatting(params.toLowerCase(), args.split(","));
+        write(">");
         unclosedTags.push(type);
     }
-    |
-    // Generic Layout
-    type=layoutType() id=id() <EOL>
+
+    // Layout, id
+    | type=layoutType() id=id() <EOL>
     {
         for (int i = 0; i < numTabs; i++) {
             write("" + "\t");
         }
 
+        writeln("<" + type);
         if (firstElement) {
             writeTabbedLine("xmlns:android=\"http://schemas.android.com/apk/res/android\"");
             firstElement = false;
         }
-
-        writeln("<" + type);
         writeIdWidthAndHeight(id);
+        write(">");
         writeln("");
         unclosedTags.push(type);
     }
-    |
+
     // ********** Controls **************
-    <INDENT> type=controlType() id=id() text=controlText() <EOL>
+    // Indent, control, id, text
+    | <INDENT> type=controlType() id=id() text=controlText() <EOL>
     {
         numTabs += 1;
         for (int i = 0; i < numTabs; i++) {
@@ -408,8 +475,9 @@ void parseNextLine():
         writeTabbedLine("android:text=" + text + " />");
         writeln("");
     }
-    |
-    <INDENTANDCLOSE> type=controlType() id=id() text=controlText() <EOL>
+
+    // Self closing indent, control, id, text
+    | <INDENTANDCLOSE> type=controlType() id=id() text=controlText() <EOL>
     {
         numTabs += 1;
         for (int i = 0; i < numTabs; i++) {
@@ -421,8 +489,8 @@ void parseNextLine():
         writeln("</" + unclosedTags.pop() + ">");
         writeln("");
     }
-    |
-    <CLOSETAG> type=controlType() id=id() text=controlText() <EOL>
+    // Clsoing tag, control, id, text
+    | <CLOSETAG> type=controlType() id=id() text=controlText() <EOL>
     {
         for (int i = 0; i < numTabs; i++) {
             write("" + "\t");
@@ -433,8 +501,8 @@ void parseNextLine():
         writeln("</" + unclosedTags.pop() + ">");
         writeln("");
     }
-    |
-    type=controlType() id=id() text=controlText() <EOL>
+    // Control, id, text
+    | type=controlType() id=id() text=controlText() <EOL>
     {
         for (int i = 0; i < numTabs; i++) {
             write("" + "\t");
@@ -444,8 +512,20 @@ void parseNextLine():
         writeTabbedLine("android:text=" + text + " />");
         writeln("");
     }
-    |
-    <EOF>   
+    | <FAB> id=id() <EOL>
+    {
+        for (int i = 0; i < numTabs; i++) {
+            write("" + "\t");
+        }
+        writeln("<android.support.design.widget.FloatingActionButton");
+        writeIdWidthAndHeight(id);
+        writeTabbedLine("app:elevation=4dp");
+        writeTabbedLine("app:fabSize=\"small\"");
+        writeTabbedLine("android:src=\"android:drawable/ic_launcher\"/>");
+        writeln("");        
+    }
+    // End of file.
+    | <EOF>   
     { 
         close(); 
         System.exit(0); 
@@ -460,17 +540,32 @@ String controlType():
     type = <BUTTON> { 
         return type.toString(); 
     }
+    | type = <BTN> {
+        return "Button";
+    }
     | type = <EDITTEXT> { 
         return type.toString(); 
+    }
+    | type = <ET> {
+        return "EditText";
     }
     | type = <TEXTVIEW> { 
         return type.toString();
     }
+    | type = <TV> {
+        return "TextView";
+    }
     | type = <LISTVIEW> { 
         return type.toString(); 
     }
+    | type = <LV> {
+        return "ListView";
+    }
     | type = <RECYCLERVIEW> { 
         return type.toString(); 
+    }
+    | type = <RV> {
+        return "RecyclerView";
     }
 }
 
@@ -482,8 +577,14 @@ String layoutType():
     type = <RELLAYOUT> { 
         return type.toString(); 
     }
+    | type = <RL> {
+        return "RelativeLayout";
+    }
     | type = <LINLAYOUT> {
         return type.toString(); 
+    }
+    | type = <LL> {
+        return "LinearLayout";
     }
     | type = <FRMLAYOUT> {
         return type.toString();
@@ -502,8 +603,7 @@ String name():
     | 
     name = <TEXT> 
     { 
-        System.out.println(badName); 
-        return badName; 
+        return name.toString();
     }
 }
 
@@ -519,8 +619,7 @@ String id():
     | 
     id = <TEXT> 
     { 
-        System.out.println(badId); 
-        return badId; 
+        return id.toString();
     }
 }
 
@@ -569,8 +668,8 @@ String fileName():
 {
     fileName = <FILE>
     {
-        String result = fileName.toString().substring(4);
-        result = result.substring(0, result.length()-1);
+        String result = fileName.toString().substring(3);
+        result = result.substring(0, result.length());
         return result;
     }
 }

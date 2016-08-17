@@ -1,0 +1,31 @@
+-- test6.xml
+LinearLayout newLL
+Button someId "some text"
+FAB newFab
+/
+
+-- Test6Activity.java
+NewActivity
+OnCreate
+Click someId
+End
+End
+
+-- test7.xml
+LL newLL2
+BTN someId2 "some more text"
+TV someTv "some text"
+BTN someId3 "some more text"
+BTN someId4 "some more text"
+BTN someId5 "WHAT UP BEEYATCH"
+BTN someId6 "EVEN more text"
+BTN someId7 "some more"
+/
+
+-- Test6Activity2.java
+NewActivity
+OnCreate
+Click someBtn
+Click someEditText
+End
+End

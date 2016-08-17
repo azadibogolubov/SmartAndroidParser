@@ -2,4 +2,11 @@
 
 ./javacc/bin/javacc DroidParser.jj
 javac DroidParser.java
-java DroidParser testFile ~/Desktop/compass/Demo/app/src/main/res/layout/activity_main.xml
+
+echo "What is the input file? "
+read fileName
+
+echo "What is the default output file? "
+read outputFile
+
+java DroidParser $fileName $outputFile
