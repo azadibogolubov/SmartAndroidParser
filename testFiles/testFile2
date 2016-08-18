@@ -1,0 +1,9 @@
+-- test2.xml
+
+LinearLayout someId Margin,15,20,5,30
+' EditText someOtherTv "some tv"
+Button someBtn "some text"
+LinearLayout someNewLL Margin,50,50,50,50
+' Button someNewBtn "some other text"
+/
+/

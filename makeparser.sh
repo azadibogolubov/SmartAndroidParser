@@ -2,4 +2,11 @@
 
 ./javacc/bin/javacc DroidParser.jj
 javac DroidParser.java
-java DroidParser testFile outputfile.xml
+
+echo "What is the input file? "
+read fileName
+
+echo "What is the default output file? "
+read outputFile
+
+java DroidParser $fileName $outputFile

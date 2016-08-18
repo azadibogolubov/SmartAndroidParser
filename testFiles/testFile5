@@ -1,0 +1,6 @@
+-- test5.xml
+LinearLayout someId
+' TextView someTv "Email"
+TextView someCoolName "Print"
+/
+
