@@ -20,8 +20,16 @@ End
 
 There are sample scripts available in the testFiles folder.
 
+To run these, use:  
+```
+./makeparser.sh  
+```
+
+Enter the file name from testFiles (just the file name, the directory path is coded into the shell script).  
+
 A valid script might look like the following:
 ```
+-- someFile.xml
 LinearLayout someId
 ~ Button someId "some text"
 ~ Textview someId "some text"
@@ -32,7 +40,7 @@ LinearLayout someId
 /
 ```
 
-Will generate the following XML:
+Will generate the following XML, as someFile.xml in the current directory:
 
 ```xml
 <LinearLayout
