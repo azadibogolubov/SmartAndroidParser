@@ -1,7 +1,7 @@
 # SmartAndroidParser
 This is a transpiler which will generate Android XML using a DSL to simplify the process of writing boilerplate code.
 
-Supported XML types at this time include:
+Supported XML types at this time include:  
 Button  
 TextView  
 EditText  
@@ -12,7 +12,7 @@ RecyclerView
 FAB  
 Dialog - Generates a boilerplate dialog  
 
-Supported Java tags are as follows:
+Supported Java tags are as follows:  
 NewActivity  
 OnCreate  
 Click  
