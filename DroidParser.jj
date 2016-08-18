@@ -1,3 +1,4 @@
+ls
 options {
     LOOKAHEAD = 3;
 }
@@ -521,7 +522,7 @@ void parseNextLine():
         writeIdWidthAndHeight(id);
         writeTabbedLine("app:elevation=4dp");
         writeTabbedLine("app:fabSize=\"small\"");
-        writeTabbedLine("android:src=\"android:drawable/ic_launcher\"/>");
+        writeTabbedLine("android:src=\"@android:drawable/ic_launcher\"/>");
         writeln("");        
     }
     // End of file.
