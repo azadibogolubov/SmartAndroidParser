@@ -1,11 +1,24 @@
 # SmartAndroidParser
 This is a transpiler which will generate Android XML using a DSL to simplify the process of writing boilerplate code.
 
-Sample script entries include:
+Supported XML types at this time include:
+Button
+TextView
+EditText
+RelativeLayout
+LinearLayout
+FrameLayout
+RecyclerView
+FAB
+Dialog - Generates a boilerplate dialog
 
-[Button | TextView | EditText | ListView ] 
+Supported Java tags are as follows:
+NewActivity
+OnCreate
+Click
+End
 
-[RelativeLayout | LinearLayout ] 
+There are sample scripts available in the testFiles folder.
 
 A valid script might look like the following:
 ```
