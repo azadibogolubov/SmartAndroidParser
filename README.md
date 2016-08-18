@@ -2,21 +2,21 @@
 This is a transpiler which will generate Android XML using a DSL to simplify the process of writing boilerplate code.
 
 Supported XML types at this time include:
-Button
-TextView
-EditText
-RelativeLayout
-LinearLayout
-FrameLayout
-RecyclerView
-FAB
-Dialog - Generates a boilerplate dialog
+Button  
+TextView  
+EditText  
+RelativeLayout  
+LinearLayout  
+FrameLayout  
+RecyclerView  
+FAB  
+Dialog - Generates a boilerplate dialog  
 
 Supported Java tags are as follows:
-NewActivity
-OnCreate
-Click
-End
+NewActivity  
+OnCreate  
+Click  
+End  
 
 There are sample scripts available in the testFiles folder.
 
